@@ -1,0 +1,56 @@
+- name: Ensure Magento root exists
+  file:
+    path: "{{ magento_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+    recurse: yes
+
+- name: Install Composer
+  get_url:
+    url: https://getcomposer.org/download/latest-stable/composer.phar
+    dest: /usr/local/bin/composer
+    mode: "0755"
+
+- name: Create Magento project (idempotent)
+  command: >
+    composer create-project
+    --repository=https://mirror.mage-os.org/
+    magento/project-community-edition={{ magento_version }}
+    {{ magento_root }}
+  args:
+    creates: "{{ magento_root }}/composer.lock"
+
+- name: Install Magento if not configured
+  command: >
+    {{ magento_root }}/bin/magento setup:install
+    --base-url={{ magento_base_url }}
+    --db-host={{ db_host }}
+    --db-name={{ db_name }}
+    --db-user={{ db_username }}
+    --db-password={{ db_password }}
+    --backend-frontname={{ magento_backend_frontname }}
+    --admin-firstname={{ magento_admin_firstname }}
+    --admin-lastname={{ magento_admin_lastname }}
+    --admin-email={{ magento_admin_email }}
+    --admin-user={{ magento_admin_username }}
+    --admin-password={{ magento_admin_password }}
+    --language=en_US
+    --currency=USD
+    --timezone=UTC
+    --use-rewrites=1
+  args:
+    creates: "{{ magento_root }}/app/etc/env.php"
+
+- name: Set filesystem permissions
+  file:
+    path: "{{ item }}"
+    owner: www-data
+    group: www-data
+    recurse: yes
+  loop:
+    - "{{ magento_root }}"
+    - "{{ magento_root }}/var"
+    - "{{ magento_root }}/pub"
+    - "{{ magento_root }}/app/etc"

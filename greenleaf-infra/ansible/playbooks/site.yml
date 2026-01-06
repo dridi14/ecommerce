@@ -1,0 +1,11 @@
+- hosts: magento
+  become: true
+  vars:
+    magento_root: /var/www/magento
+    php_version: "8.2"
+    magento_version: "2.4.7-p1"
+  roles:
+    - role: common
+    - role: php
+    - role: nginx
+    - role: magento

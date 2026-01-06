@@ -1,0 +1,33 @@
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Deploy Magento vhost
+  template:
+    src: nginx-magento.conf.j2
+    dest: /etc/nginx/sites-available/magento.conf
+    mode: "0644"
+
+- name: Enable Magento site
+  file:
+    src: /etc/nginx/sites-available/magento.conf
+    dest: /etc/nginx/sites-enabled/magento.conf
+    state: link
+
+- name: Test Nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Reload Nginx
+  service:
+    name: nginx
+    state: reloaded
+    enabled: yes
