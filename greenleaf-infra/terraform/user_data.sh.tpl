@@ -1,5 +1,5 @@
 #!/bin/bash
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
 set -xe
 
 REPO_URL="${ansible_repo_url}"
@@ -8,9 +8,8 @@ WORKDIR="/opt/greenleaf-infra"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y git python3 python3-pip
-pip3 install --upgrade pip
-pip3 install "ansible>=2.15,<2.17"
+apt-get install -y git python3 python3-pip ansible
+ansible --version
 
 rm -rf "$WORKDIR"
 git clone --branch "$REPO_BRANCH" "$REPO_URL" "$WORKDIR"
@@ -23,7 +22,7 @@ localhost ansible_connection=local
 EOF
 
 mkdir -p group_vars
-cat > group_vars/all.yml <<'EOF'
+cat > group_vars/all.yml <<EOF
 magento_base_url: "${magento_base_url}"
 magento_backend_frontname: "${magento_backend_frontname}"
 magento_admin_email: "${magento_admin_email}"
