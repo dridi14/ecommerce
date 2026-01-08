@@ -12,10 +12,10 @@ apt-get install -y git python3 python3-pip
 pip3 install --upgrade pip
 pip3 install "ansible>=2.15,<2.17"
 
-rm -rf "${WORKDIR}"
-git clone --branch "${REPO_BRANCH}" "${REPO_URL}" "${WORKDIR}"
+rm -rf "$WORKDIR"
+git clone --branch "$REPO_BRANCH" "$REPO_URL" "$WORKDIR"
 
-cd "${WORKDIR}/ansible"
+cd "$WORKDIR/ansible"
 
 cat > inventory.ini <<'EOF'
 [magento]
