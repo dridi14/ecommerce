@@ -22,26 +22,36 @@
   args:
     creates: "{{ magento_root }}/composer.lock"
 
-- name: Install Magento if not configured
-  command: >
-    {{ magento_root }}/bin/magento setup:install
-    --base-url={{ magento_base_url }}
-    --db-host={{ db_host }}
-    --db-name={{ db_name }}
-    --db-user={{ db_username }}
-    --db-password={{ db_password }}
-    --backend-frontname={{ magento_backend_frontname }}
-    --admin-firstname={{ magento_admin_firstname }}
-    --admin-lastname={{ magento_admin_lastname }}
-    --admin-email={{ magento_admin_email }}
-    --admin-user={{ magento_admin_username }}
-    --admin-password={{ magento_admin_password }}
-    --language=en_US
-    --currency=USD
-    --timezone=UTC
-    --use-rewrites=1
+- name: Deploy env.php
+  template:
+    src: env.php.j2
+    dest: "{{ magento_root }}/app/etc/env.php"
+    owner: www-data
+    group: www-data
+    mode: "0644"
+
+- name: Set Production Mode
+  command: bin/magento deploy:mode:set production --skip-compilation
   args:
-    creates: "{{ magento_root }}/app/etc/env.php"
+    chdir: "{{ magento_root }}"
+
+- name: Compile DI
+  command: bin/magento setup:di:compile
+  args:
+    chdir: "{{ magento_root }}"
+  become_user: www-data
+
+- name: Deploy Static Content
+  command: bin/magento setup:static-content:deploy -f
+  args:
+    chdir: "{{ magento_root }}"
+  become_user: www-data
+
+- name: Install Cron
+  command: bin/magento cron:install
+  args:
+    chdir: "{{ magento_root }}"
+  become_user: www-data
 
 - name: Set filesystem permissions
   file:
@@ -50,7 +60,6 @@
     group: www-data
     recurse: yes
   loop:
-    - "{{ magento_root }}"
     - "{{ magento_root }}/var"
     - "{{ magento_root }}/pub"
-    - "{{ magento_root }}/app/etc"
+    - "{{ magento_root }}/generated"

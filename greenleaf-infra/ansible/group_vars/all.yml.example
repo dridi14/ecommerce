@@ -8,8 +8,16 @@ magento_admin_firstname: "Admin"
 magento_admin_lastname: "User"
 magento_admin_username: "admin"
 magento_admin_password: "ChangeMe123!"
+magento_crypt_key: "md5_hash_of_your_choice_or_random_string"
 
 db_host: "db-endpoint"
 db_name: "magento"
 db_username: "magento"
 db_password: "ChangeMe123!"
+
+redis_host: "redis-endpoint"
+redis_port: "6379"
+
+search_engine: "opensearch"
+search_engine_host: "opensearch-endpoint"
+search_engine_port: "9200"
