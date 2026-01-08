@@ -85,7 +85,7 @@ variable "magento_base_url" {
 variable "ansible_repo_url" {
   description = "Git URL for Ansible playbooks to run from user data."
   type        = string
-  default     = "https://github.com/example/greenleaf-infra.git"
+  default     = "https://github.com/dridi14/ecommerce"
 }
 
 variable "ansible_repo_branch" {
