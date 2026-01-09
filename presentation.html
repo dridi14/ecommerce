@@ -1642,102 +1642,94 @@
                     <!-- Left Column: Detailed Table -->
                     <div class="w-3/5 flex flex-col">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1">
-                            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                                 <h3 class="font-bold text-gray-700">Détail par Service</h3>
                                 <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">Région: eu-west-3</span>
                             </div>
                             <table class="w-full text-left border-collapse cost-table">
                                 <thead>
                                     <tr>
-                                        <th class="px-6 py-3">Service</th>
-                                        <th class="px-6 py-3">Configuration</th>
-                                        <th class="px-6 py-3 text-right">Coût Est. (USD)</th>
+                                        <th class="px-4 py-2.5 text-xs">Service</th>
+                                        <th class="px-4 py-2.5 text-xs">Configuration</th>
+                                        <th class="px-4 py-2.5 text-xs text-right">Coût Est. (USD)</th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-sm">
+                                <tbody class="text-xs">
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-database text-blue-500 w-6"></i> Amazon RDS
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-database text-blue-500 w-5 mr-2"></i> Amazon RDS
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>MariaDB, db.t3.small</p>
-                                            <p class="text-xs text-gray-400">Multi-AZ, Haute Disponibilité</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            MariaDB db.t3.small Multi-AZ
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$72.00</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$72.00</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-server text-orange-500 w-6"></i> EC2 (Web)
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-server text-orange-500 w-5 mr-2"></i> EC2 (Web)
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>2x t3.small (Linux)</p>
-                                            <p class="text-xs text-gray-400">2 vCPU / 2 Go RAM (stabilité Magento)</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            2x t3.small (2 vCPU / 2 Go RAM)
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$33.60</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$33.60</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-server text-orange-500 w-6"></i> EC2 (Search)
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-server text-orange-500 w-5 mr-2"></i> EC2 (Search)
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>1x t3.small</p>
-                                            <p class="text-xs text-gray-400">OpenSearch auto-hébergé</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            1x t3.small (OpenSearch)
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$16.80</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$16.80</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-network-wired text-purple-500 w-6"></i> VPC (NAT)
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-network-wired text-purple-500 w-5 mr-2"></i> VPC (NAT)
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>2x NAT Gateways</p>
-                                            <p class="text-xs text-gray-400">Sécurisation subnets privés (2 AZ)</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            2x NAT Gateways (2 AZ)
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$74.40</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$74.40</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-network-wired text-indigo-500 w-6"></i> Load Balancer
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-network-wired text-indigo-500 w-5 mr-2"></i> Load Balancer
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>Application Load Balancer</p>
-                                            <p class="text-xs text-gray-400">730h/mois + traitement trafic</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            Application Load Balancer (730h)
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$26.50</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$26.50</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-bolt text-red-500 w-6"></i> ElastiCache
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-bolt text-red-500 w-5 mr-2"></i> ElastiCache
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>cache.t3.micro (Redis)</p>
-                                            <p class="text-xs text-gray-400">Cache de session Magento</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            cache.t3.micro (Redis)
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$13.00</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$13.00</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-globe text-green-500 w-6"></i> Data Transfer
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-globe text-green-500 w-5 mr-2"></i> Data Transfer
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>Trafic Sortant Internet</p>
-                                            <p class="text-xs text-gray-400">~500 Go (avec compression)</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            ~500 Go sortant (compressé)
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$45.00</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$45.00</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
-                                            <i class="fas fa-hdd text-gray-500 w-6"></i> Stockage & Monitoring
+                                        <td class="px-4 py-2 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-hdd text-gray-500 w-5 mr-2"></i> Stockage & Monitoring
                                         </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <p>EBS gp3 + EFS + CloudWatch</p>
-                                            <p class="text-xs text-gray-400">Volumes racines, médias, logs</p>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            EBS gp3 + EFS + CloudWatch
                                         </td>
-                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$10.20</td>
+                                        <td class="px-4 py-2 text-right font-mono text-gray-800">$10.20</td>
                                     </tr>
                                     <tr class="bg-gray-100">
-                                        <td class="px-6 py-4 font-bold text-gray-800" colspan="2">TOTAL MENSUEL ESTIMÉ (Pay-As-You-Go)</td>
-                                        <td class="px-6 py-4 text-right font-bold text-blue-700 font-mono text-lg">$291.50</td>
+                                        <td class="px-4 py-2.5 font-bold text-gray-800 text-xs" colspan="2">TOTAL MENSUEL ESTIMÉ (Pay-As-You-Go)</td>
+                                        <td class="px-4 py-2.5 text-right font-bold text-blue-700 font-mono">$291.50</td>
                                     </tr>
                                 </tbody>
                             </table>
