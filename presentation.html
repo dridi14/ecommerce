@@ -774,12 +774,12 @@
                         </div>
                         <div>
                             <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Base de Données</h2>
-                            <p class="text-blue-600 font-semibold mt-1">Amazon RDS MariaDB Multi-AZ</p>
+                            <p class="text-blue-600 font-semibold mt-1">Amazon RDS MySQL Multi-AZ</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-3 opacity-80">
                         <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold uppercase tracking-wider border border-blue-200">RDS</span>
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase tracking-wider border border-green-200">MariaDB</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase tracking-wider border border-green-200">MySQL 8.0</span>
                     </div>
                 </div>
                 <!-- Content Grid -->
@@ -798,7 +798,7 @@
                                 <div class="flex flex-wrap gap-2">
                                     <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">db.t3.small</span>
                                     <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Multi-AZ</span>
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">MariaDB</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">MySQL 8.0</span>
                                 </div>
                             </div>
                         </div>
@@ -919,75 +919,75 @@
                             <i class="fas fa-network-wired text-3xl text-green-700"></i>
                         </div>
                         <div>
-                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Stockage Médias & CDN</h2>
-                            <p class="text-green-600 font-semibold mt-1">Performance globale & Optimisation des coûts</p>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Stockage & Performance</h2>
+                            <p class="text-green-600 font-semibold mt-1">Stockage local & Optimisation des performances</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-3 opacity-80">
-                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded text-xs font-bold uppercase tracking-wider border border-green-200">S3</span>
-                        <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold uppercase tracking-wider border border-orange-200">CloudFront</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded text-xs font-bold uppercase tracking-wider border border-green-200">EBS</span>
+                        <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold uppercase tracking-wider border border-orange-200">EFS</span>
                     </div>
                 </div>
                 <!-- Content Grid -->
                 <div class="flex space-x-10 h-full">
                     <!-- Left Column: Icon Bullets List -->
                     <div class="w-7/12 flex flex-col space-y-5">
-                        <!-- Item 1: S3 -->
+                        <!-- Item 1: EBS Storage -->
                         <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
                             <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-green"></div>
                             <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
                                 <i class="fas fa-hdd text-2xl text-aws-green"></i>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-lg font-bold text-gray-800 mb-1">Amazon S3 (Stockage Médias)</h3>
-                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Stockage centralisé et durable pour les images produits Magento et assets statiques.</p>
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">EBS Volumes (Stockage Local)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Volumes gp3 attachés aux instances EC2 pour le système de fichiers et les médias produits Magento.</p>
                                 <div class="flex flex-wrap gap-2">
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-images mr-1 text-green-500"></i>media/catalog</span>
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">99.99% Durabilité</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-server mr-1 text-green-500"></i>Volumes racines</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">gp3 (haute performance)</span>
                                 </div>
                             </div>
                         </div>
-                        <!-- Item 2: CloudFront -->
+                        <!-- Item 2: EFS -->
                         <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
                             <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-orange"></div>
                             <div class="bg-orange-50 p-3 rounded-full mr-5 group-hover:bg-orange-100 transition-colors">
-                                <i class="fas fa-globe text-2xl text-aws-orange"></i>
+                                <i class="fas fa-network-wired text-2xl text-aws-orange"></i>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-lg font-bold text-gray-800 mb-1">CloudFront (CDN)</h3>
-                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Mise en cache du contenu aux points de présence (Edge Locations) pour réduire la latence.</p>
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Amazon EFS (Stockage Partagé)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Système de fichiers partagé pour les médias produits, accessible depuis toutes les instances EC2.</p>
                                 <div class="flex gap-2 text-sm text-gray-700">
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-bolt mr-1 text-orange-500"></i>Cache Hit élevé</span>
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Compression Gzip/Brotli</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-share-alt mr-1 text-orange-500"></i>Multi-AZ</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Accès simultané</span>
                                 </div>
                             </div>
                         </div>
-                        <!-- Item 3: Lifecycle Policies -->
+                        <!-- Item 3: Compression -->
                         <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
                             <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-blue"></div>
                             <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
-                                <i class="fas fa-clock text-2xl text-aws-blue"></i>
+                                <i class="fas fa-compress text-2xl text-aws-blue"></i>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-lg font-bold text-gray-800 mb-1">Lifecycle Policies & Coûts</h3>
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Optimisation Trafic</h3>
                                 <p class="text-gray-600 text-sm leading-relaxed">
-                                    Automatisation du cycle de vie des données pour optimiser les coûts de stockage.
+                                    Compression Gzip/Brotli activée sur Nginx pour réduire le trafic sortant de 70% et améliorer les performances.
                                 </p>
                                 <div class="mt-2 text-xs text-gray-500 flex items-center">
-                                    <i class="fas fa-arrow-right mr-1 text-blue-400"></i> Standard → Intelligent Tiering → Glacier
+                                    <i class="fas fa-arrow-down mr-1 text-blue-400"></i> Réduction trafic sortant : ~70%
                                 </div>
                             </div>
                         </div>
-                        <!-- Item 4: Security -->
+                        <!-- Item 4: Backup -->
                         <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
                             <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-600"></div>
                             <div class="bg-gray-100 p-3 rounded-full mr-5 group-hover:bg-gray-200 transition-colors">
-                                <i class="fas fa-user-shield text-2xl text-gray-700"></i>
+                                <i class="fas fa-history text-2xl text-gray-700"></i>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-lg font-bold text-gray-800 mb-1">Origin Access Control (OAC)</h3>
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Sauvegarde & Récupération</h3>
                                 <p class="text-gray-600 text-sm leading-relaxed">
-                                    Le bucket S3 est privé. Seule la distribution CloudFront est autorisée à lire les objets via OAC.
+                                    Snapshots EBS automatiques et sauvegardes EFS pour garantir la récupération des données en cas d'incident.
                                 </p>
                             </div>
                         </div>
@@ -997,37 +997,37 @@
                         <div class="bg-gray-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
                             <!-- Decorative Background -->
                             <div class="absolute top-0 right-0 p-4 opacity-5">
-                                <i class="fas fa-share-alt text-9xl"></i>
+                                <i class="fas fa-database text-9xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
-                                Stratégie de Distribution
+                                Architecture Stockage
                             </h3>
                             <!-- Spec Table -->
                             <div class="space-y-4 flex-1">
                                 <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
-                                    <span class="text-gray-600 text-sm font-semibold">Origin Source</span>
-                                    <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-sm font-bold">S3 Bucket</span>
+                                    <span class="text-gray-600 text-sm font-semibold">Stockage Local</span>
+                                    <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-sm font-bold">EBS gp3</span>
                                 </div>
                                 <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
-                                    <span class="text-gray-600 text-sm font-semibold">Viewer Protocol</span>
-                                    <span class="text-gray-800 text-sm">Redirect HTTP to HTTPS</span>
+                                    <span class="text-gray-600 text-sm font-semibold">Stockage Partagé</span>
+                                    <span class="text-gray-800 text-sm">EFS Multi-AZ</span>
                                 </div>
                                 <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
-                                    <span class="text-gray-600 text-sm font-semibold">Cache Patterns</span>
-                                    <span class="text-gray-800 text-sm font-mono text-xs">/media/*, /static/*</span>
+                                    <span class="text-gray-600 text-sm font-semibold">Compression</span>
+                                    <span class="text-gray-800 text-sm">Gzip/Brotli activé</span>
                                 </div>
                                 <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
-                                    <span class="text-gray-600 text-sm font-semibold">Price Class</span>
-                                    <span class="text-orange-600 text-sm font-bold flex items-center">Use All Edge Locations</span>
+                                    <span class="text-gray-600 text-sm font-semibold">Chiffrement</span>
+                                    <span class="text-green-600 text-sm font-bold flex items-center"><i class="fas fa-lock mr-2"></i> AES-256</span>
                                 </div>
                             </div>
                             <!-- Performance Focus Box -->
                             <div class="mt-auto bg-white rounded-lg p-4 border-l-4 border-orange-500 shadow-sm">
                                 <h4 class="text-orange-800 font-bold text-sm mb-1 flex items-center">
-                                    <i class="fas fa-tachometer-alt mr-2"></i> Gain de Performance
+                                    <i class="fas fa-tachometer-alt mr-2"></i> Optimisation
                                 </h4>
                                 <p class="text-xs text-gray-600 leading-snug">
-                                    Le déchargement des assets statiques vers le CDN réduit la charge CPU des instances EC2 d'environ 40% et améliore drastiquement le temps de chargement.
+                                    La compression active réduit le trafic sortant de 70%, optimisant les coûts de Data Transfer tout en améliorant les temps de chargement pour les utilisateurs.
                                 </p>
                             </div>
                         </div>
@@ -1255,7 +1255,7 @@
                                 <h3 class="text-lg font-bold text-gray-800 mb-1">Gestion des Identités (IAM)</h3>
                                 <p class="text-gray-600 text-sm leading-relaxed mb-2">Rôles et permissions granulaires.</p>
                                 <div class="flex flex-wrap gap-2">
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Rôle EC2 pour S3/Secrets</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Rôle EC2 pour Secrets</span>
                                     <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Utilisateur Terraform dédié</span>
                                 </div>
                             </div>
@@ -1282,7 +1282,7 @@
                             <div class="flex-1">
                                 <h3 class="text-lg font-bold text-gray-800 mb-1">Chiffrement de Bout en Bout</h3>
                                 <p class="text-gray-600 text-sm leading-relaxed">
-                                    Données chiffrées au repos (EBS, S3, RDS) et en transit (TLS/SSL via ACM pour ALB/CloudFront).
+                                    Données chiffrées au repos (EBS, EFS, RDS) et en transit (TLS/SSL via ACM pour ALB).
                                 </p>
                             </div>
                         </div>
@@ -1313,7 +1313,7 @@
                                 </div>
                                 <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm border-l-4 border-gray-500">
                                     <span class="text-gray-600 text-sm font-semibold">Stockage</span>
-                                    <span class="text-gray-800 text-sm">AES-256 (S3/EBS)</span>
+                                    <span class="text-gray-800 text-sm">AES-256 (EBS/EFS)</span>
                                 </div>
                             </div>
                             <!-- Security Focus Box -->
@@ -1374,7 +1374,7 @@
                                 <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
                                     <li>VPC & Réseau</li>
                                     <li>Security Groups</li>
-                                    <li>RDS & S3</li>
+                                    <li>RDS & EFS</li>
                                     <li>Load Balancer (ALB)</li>
                                 </ul>
                             </div>
@@ -1660,7 +1660,7 @@
                                             <i class="fas fa-database text-blue-500 w-5 mr-2"></i> Amazon RDS
                                         </td>
                                         <td class="px-4 py-2 text-gray-600">
-                                            MariaDB db.t3.small Multi-AZ
+                                            MySQL 8.0 db.t3.small Multi-AZ
                                         </td>
                                         <td class="px-4 py-2 text-right font-mono text-gray-800">$72.00</td>
                                     </tr>

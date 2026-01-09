@@ -95,30 +95,30 @@
 **📋 Slide DAT** - Document d'Architecture Technique
 
 ### Points à mentionner :
-- **RDS MariaDB** : db.t3.small Multi-AZ
+- **RDS MySQL** : db.t3.small Multi-AZ
 - **Haute Disponibilité** : réplication synchrone vers instance standby
 - **Failover automatique** : RTO < 5 minutes
 - **Sauvegardes** : rétention 7 jours, snapshots automatiques
 - **Sécurité** : base isolée, accessible uniquement depuis EC2 via Security Groups
 
 ### Phrases clés :
-> "RDS MariaDB en Multi-AZ assure la haute disponibilité avec réplication synchrone. En cas de panne, le failover automatique garantit un RTO inférieur à 5 minutes."
+> "RDS MySQL en Multi-AZ assure la haute disponibilité avec réplication synchrone. En cas de panne, le failover automatique garantit un RTO inférieur à 5 minutes."
 
 ---
 
-## Slide 7 : Stockage Médias & CDN
+## Slide 7 : Stockage & Performance
 **Durée : 30 secondes**  
 **📋 Slide DAT** - Document d'Architecture Technique
 
 ### Points à mentionner :
-- **Amazon S3** : stockage centralisé pour images produits Magento
-- **CloudFront CDN** : mise en cache aux Edge Locations (réduction latence)
-- **Lifecycle Policies** : optimisation coûts (Standard → Intelligent Tiering → Glacier)
-- **Origin Access Control** : bucket S3 privé, accessible uniquement via CloudFront
-- **Gain performance** : réduction charge CPU EC2 de ~40%
+- **EBS Volumes** : stockage local gp3 attaché aux instances EC2 pour système de fichiers et médias
+- **Amazon EFS** : système de fichiers partagé Multi-AZ pour médias produits, accessible depuis toutes les instances
+- **Compression** : Gzip/Brotli activé sur Nginx réduit trafic sortant de 70%
+- **Sauvegarde** : Snapshots EBS automatiques et sauvegardes EFS
+- **Optimisation** : Compression réduit coûts Data Transfer et améliore performances
 
 ### Phrases clés :
-> "S3 stocke les médias produits, CloudFront les distribue globalement. Cette architecture réduit la charge CPU de 40% et améliore drastiquement les temps de chargement."
+> "EBS stocke les données locales, EFS partage les médias entre instances. La compression Gzip/Brotli réduit le trafic sortant de 70% et optimise les coûts."
 
 ---
 
@@ -144,9 +144,9 @@
 
 ### Points à mentionner :
 - **Security Groups restrictifs** : principe du moindre privilège appliqué
-- **IAM** : rôles granulaires (EC2 pour S3/Secrets, utilisateur Terraform dédié)
+- **IAM** : rôles granulaires (EC2 pour Secrets, utilisateur Terraform dédié)
 - **Secrets Manager** : gestion sécurisée credentials DB et clés API Magento
-- **Chiffrement** : données au repos (EBS, S3, RDS) et en transit (TLS/SSL via ACM)
+- **Chiffrement** : données au repos (EBS, EFS, RDS) et en transit (TLS/SSL via ACM)
 - **Conformité** : respect AWS Well-Architected Framework (pilier Sécurité)
 
 ### Phrases clés :
