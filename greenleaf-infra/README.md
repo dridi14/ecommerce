@@ -8,6 +8,7 @@ Terraform builds a minimal-but-HA Magento stack (VPC, ALB, ASG, RDS). Ansible in
 - ALB + Target Group + Listener 80.
 - Launch Template + ASG (min/des=1, max=2) with user-data running Ansible from this repo.
 - RDS MySQL 8 (non-public, Multi-AZ configurable).
+- Amazon OpenSearch Service (single-node, cheapest default).
 - IAM role/profile for EC2 (AmazonSSMManagedInstanceCore) and CPU alarm.
 - Ansible roles: common, php (8.2), nginx, magento (2.4.7-p1 via repo.magento.com).
 - Scripts: bootstrap/destroy/validate.
@@ -56,4 +57,5 @@ Never commit secrets. Provide via:
 ## Notes
 - Default deployment is HTTP-only. Add ACM cert + HTTPS listener for production.
 - Magento install uses repo.magento.com with Marketplace keys in `/root/.composer/auth.json`.
+- OpenSearch is required by Magento 2.4.x; the stack provisions a minimal domain.
 - Instances are in public subnets with public IPs for simplicity; add private subnets + NAT if stronger isolation is needed.

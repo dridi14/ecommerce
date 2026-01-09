@@ -84,6 +84,11 @@
     --db-name={{ db_name }}
     --db-user={{ db_username }}
     --db-password={{ db_password }}
+    --search-engine=opensearch
+    --search-engine-host={{ opensearch_host }}
+    --search-engine-port={{ opensearch_port }}
+    --search-engine-ssl=1
+    --search-engine-ssl-verify=0
     --backend-frontname={{ magento_backend_frontname }}
     --admin-firstname={{ magento_admin_firstname }}
     --admin-lastname={{ magento_admin_lastname }}

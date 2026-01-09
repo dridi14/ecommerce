@@ -17,6 +17,9 @@ db_password: "ChangeMe123!"
 magento_public_key: "your-public-key"
 magento_private_key: "your-private-key"
 
+opensearch_host: "search-domain-endpoint"
+opensearch_port: 443
+
 magento_search_engine: opensearch
 magento_opensearch_host: "127.0.0.1"
 magento_opensearch_port: "9200"
