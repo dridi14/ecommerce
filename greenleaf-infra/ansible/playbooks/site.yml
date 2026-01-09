@@ -4,6 +4,10 @@
     magento_root: /var/www/magento
     php_version: "8.2"
     magento_version: "2.4.7-p1"
+
+  vars_files:
+    - ../group_vars/all.yml
+
   roles:
     - role: common
     - role: php

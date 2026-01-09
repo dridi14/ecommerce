@@ -24,6 +24,8 @@
   command: composer config --global audit.block-insecure false
   environment:
     COMPOSER_ALLOW_SUPERUSER: "1"
+    COMPOSER_HOME: "/root/.composer"
+    COMPOSER_BLOCK_INSECURE_PACKAGES: "0"
   args:
     creates: /root/.composer/config.json
 
@@ -51,17 +53,17 @@
     --no-progress
     --prefer-dist
     --repository-url=https://repo.magento.com/
-    --no-security-blocking
     magento/project-community-edition={{ magento_version }}
     {{ magento_root }}
   environment:
     COMPOSER_ALLOW_SUPERUSER: "1"
     COMPOSER_HOME: "/root/.composer"
+    COMPOSER_BLOCK_INSECURE_PACKAGES: "0"
   args:
     creates: "{{ magento_root }}/composer.lock"
   register: magento_create
   retries: 3
-  delay: 30
+  delay: 20
   until: magento_create.rc == 0
 
 - name: Verify Magento CLI exists
