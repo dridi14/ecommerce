@@ -118,6 +118,18 @@ variable "magento_admin_password" {
   sensitive   = true
 }
 
+variable "magento_public_key" {
+  description = "Magento Marketplace public key."
+  type        = string
+  sensitive   = true
+}
+
+variable "magento_private_key" {
+  description = "Magento Marketplace private key."
+  type        = string
+  sensitive   = true
+}
+
 variable "magento_admin_username" {
   description = "Magento admin username."
   type        = string

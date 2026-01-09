@@ -13,14 +13,66 @@
     dest: /usr/local/bin/composer
     mode: "0755"
 
+- name: Ensure Composer home directory
+  file:
+    path: /root/.composer
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Configure Composer auth for Magento Marketplace
+  copy:
+    dest: /root/.composer/auth.json
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      {
+        "http-basic": {
+          "repo.magento.com": {
+            "username": "{{ magento_public_key }}",
+            "password": "{{ magento_private_key }}"
+          }
+        }
+      }
+  no_log: true
+
 - name: Create Magento project (idempotent)
   command: >
-    composer create-project
-    --repository=https://mirror.mage-os.org/
+    /usr/local/bin/composer create-project
+    --no-interaction
+    --no-progress
+    --prefer-dist
+    --repository-url=https://repo.magento.com/
     magento/project-community-edition={{ magento_version }}
     {{ magento_root }}
+  environment:
+    COMPOSER_ALLOW_SUPERUSER: "1"
+    COMPOSER_HOME: "/root/.composer"
   args:
     creates: "{{ magento_root }}/composer.lock"
+  register: magento_create
+  retries: 3
+  delay: 20
+  until: magento_create.rc == 0
+
+- name: Ensure Magento CLI exists (fallback symlink)
+  file:
+    src: "{{ magento_root }}/vendor/magento/magento2-base/bin/magento"
+    dest: "{{ magento_root }}/bin/magento"
+    state: link
+  when: magento_root is defined
+
+- name: Verify Magento CLI exists
+  stat:
+    path: "{{ magento_root }}/bin/magento"
+  register: magento_bin
+
+- name: Fail if Magento CLI is missing
+  fail:
+    msg: "Magento CLI not found at {{ magento_root }}/bin/magento (composer install incomplete)."
+  when: not magento_bin.stat.exists
 
 - name: Install Magento if not configured
   command: >
@@ -40,6 +92,9 @@
     --currency=USD
     --timezone=UTC
     --use-rewrites=1
+    --search-engine={{ magento_search_engine }}
+    --opensearch-host={{ magento_opensearch_host }}
+    --opensearch-port={{ magento_opensearch_port }}
   args:
     creates: "{{ magento_root }}/app/etc/env.php"
 

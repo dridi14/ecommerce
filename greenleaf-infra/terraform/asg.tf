@@ -64,6 +64,8 @@ locals {
     magento_admin_lastname    = var.magento_admin_lastname
     magento_admin_username    = var.magento_admin_username
     magento_admin_password    = var.magento_admin_password
+    magento_public_key        = var.magento_public_key
+    magento_private_key       = var.magento_private_key
   })
 }
 

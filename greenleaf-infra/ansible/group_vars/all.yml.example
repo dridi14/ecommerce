@@ -13,3 +13,10 @@ db_host: "db-endpoint"
 db_name: "magento"
 db_username: "magento"
 db_password: "ChangeMe123!"
+
+magento_public_key: "your-public-key"
+magento_private_key: "your-private-key"
+
+magento_search_engine: opensearch
+magento_opensearch_host: "127.0.0.1"
+magento_opensearch_port: "9200"

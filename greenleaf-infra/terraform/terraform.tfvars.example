@@ -3,6 +3,8 @@ region       = "us-east-1"
 
 db_password            = "ChangeMe123!"
 magento_admin_password = "ChangeMe123!"
+magento_public_key     = "your-public-key"
+magento_private_key    = "your-private-key"
 magento_base_url       = ""
 
 # Optional
