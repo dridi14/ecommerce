@@ -66,6 +66,8 @@ locals {
     magento_admin_password    = var.magento_admin_password
     magento_public_key        = var.magento_public_key
     magento_private_key       = var.magento_private_key
+    opensearch_host           = aws_opensearch_domain.main.endpoint
+    opensearch_port           = 443
   })
 }
 

@@ -49,6 +49,9 @@ db_password: "${db_password}"
 
 magento_public_key: "${magento_public_key}"
 magento_private_key: "${magento_private_key}"
+
+opensearch_host: "${opensearch_host}"
+opensearch_port: "${opensearch_port}"
 EOF
 set -x
 

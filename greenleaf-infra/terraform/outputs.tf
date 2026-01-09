@@ -17,3 +17,8 @@ output "public_subnets" {
   description = "Public subnet IDs."
   value       = [for subnet in aws_subnet.public : subnet.id]
 }
+
+output "opensearch_endpoint" {
+  description = "OpenSearch endpoint."
+  value       = aws_opensearch_domain.main.endpoint
+}
