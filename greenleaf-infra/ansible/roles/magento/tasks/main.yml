@@ -12,13 +12,6 @@
     dest: /usr/local/bin/composer
     mode: "0755"
 
-- name: Disable Composer audit security block (optional but required for Magento 2.4.6)
-  command: composer config --global audit.block-insecure false
-  environment:
-    COMPOSER_ALLOW_SUPERUSER: "1"
-  args:
-    creates: /root/.composer/config.json
-
 - name: Ensure Composer home directory
   file:
     path: /root/.composer
@@ -26,6 +19,13 @@
     owner: root
     group: root
     mode: "0700"
+
+- name: Disable Composer audit security block (optional but required for Magento 2.4.6)
+  command: composer config --global audit.block-insecure false
+  environment:
+    COMPOSER_ALLOW_SUPERUSER: "1"
+  args:
+    creates: /root/.composer/config.json
 
 - name: Configure Composer auth for Magento Marketplace
   copy:
@@ -51,6 +51,7 @@
     --no-progress
     --prefer-dist
     --repository-url=https://repo.magento.com/
+    --no-security-blocking
     magento/project-community-edition={{ magento_version }}
     {{ magento_root }}
   environment:
@@ -60,7 +61,7 @@
     creates: "{{ magento_root }}/composer.lock"
   register: magento_create
   retries: 3
-  delay: 20
+  delay: 30
   until: magento_create.rc == 0
 
 - name: Verify Magento CLI exists
