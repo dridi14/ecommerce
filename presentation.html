@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>GreenLeaf - Architecture E-commerce Magento sur AWS</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Open Sans', sans-serif; 
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        h1, h2, h3, h4, .font-heading { 
+            font-family: 'Montserrat', sans-serif; 
+        }
+        .bg-tech-green { 
+            background-color: #064E3B; 
+        }
+        .text-tech-green { 
+            color: #064E3B; 
+        }
+        .bg-tech-light { 
+            background-color: #ECFDF5; 
+        }
+        .border-l-accent { 
+            border-left: 6px solid #10B981; 
+        }
+        .text-tech-orange { 
+            color: #FF9900; 
+        }
+        .text-magento { 
+            color: #F26322; 
+        }
+        .pattern-grid {
+            background-image: radial-gradient(#34D399 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .grid-pattern {
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* AWS Specific Colors */
+        .bg-aws-purple { background-color: #8C4FFF; }
+        .text-aws-purple { color: #8C4FFF; }
+        .bg-aws-orange { background-color: #FF9900; }
+        .text-aws-orange { color: #FF9900; }
+        .bg-aws-blue { background-color: #527FFF; }
+        .text-aws-blue { color: #527FFF; }
+        .bg-aws-green { background-color: #3F8624; }
+        .text-aws-green { color: #3F8624; }
+        .bg-aws-cloudwatch { background-color: #FF4F8B; }
+        .text-aws-cloudwatch { color: #FF4F8B; }
+        .text-aws-sns { color: #D6242D; }
+        .bg-aws-iam { background-color: #DD344C; }
+        .text-aws-iam { color: #DD344C; }
+        .bg-aws-kms { background-color: #232F3E; }
+        .text-aws-kms { color: #232F3E; }
+        .bg-aws-shield { background-color: #3F8624; }
+        .text-aws-shield { color: #3F8624; }
+        
+        .card-hover:hover { transform: translateY(-2px); transition: transform 0.2s ease; }
+        
+        /* Custom Timeline Styles */
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background: #E5E7EB;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        .timeline-progress {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            width: 85%;
+            height: 4px;
+            background: linear-gradient(to right, #10B981, #3B82F6);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        /* Custom Table Styling */
+        .cost-table th { background-color: #F3F4F6; color: #4B5563; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .cost-table tr:nth-child(even) { background-color: #F9FAFB; }
+        .cost-table td { border-bottom: 1px solid #E5E7EB; }
+        
+        /* Custom Card Styling */
+        .highlight-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        /* Custom Checkbox Design */
+        .check-item {
+            transition: all 0.3s ease;
+        }
+        .check-item:hover {
+            transform: translateX(5px);
+            background-color: #F0FDF4;
+        }
+        .check-circle {
+            background-color: #10B981;
+            box-shadow: 0 0 0 4px #D1FAE5;
+        }
+        
+        /* Glassmorphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* AWS Red Color */
+        .bg-aws-red { background-color: #DD344C; }
+        .text-aws-red { color: #DD344C; }
+        
+        /* Slide container */
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .slide.active {
+            display: flex;
+        }
+        
+        /* Navigation controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .slide-counter {
+            color: white;
+            padding: 0 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Slide transition animation */
+        .slide {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Fullscreen presentation mode */
+        .presentation-mode {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="presentation-mode">
+    <!-- Slide 1: Title Slide -->
+    <div class="slide active">
+        <div class="w-full h-full bg-tech-green relative flex flex-col overflow-hidden text-white shadow-2xl">
+            <!-- Background Decor -->
+            <div class="absolute top-0 right-0 w-2/3 h-full bg-green-900 transform skew-x-12 translate-x-32 opacity-50 z-0"></div>
+            <div class="absolute bottom-0 left-0 w-full h-1/2 pattern-grid opacity-5 z-0"></div>
+            <!-- AWS Hexagon Aesthetic (Abstract) -->
+            <div class="absolute top-10 right-10 text-white opacity-5">
+                <i class="fas fa-draw-polygon text-9xl"></i>
+            </div>
+            <div class="absolute bottom-20 left-10 text-white opacity-5">
+                <i class="fas fa-server text-8xl"></i>
+            </div>
+            <!-- Main Content Wrapper -->
+            <div class="relative z-10 flex flex-col h-full p-16 justify-between">
+                <!-- Header / Logos -->
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center space-x-3 bg-white bg-opacity-10 px-6 py-3 rounded-lg backdrop-filter backdrop-blur-sm">
+                        <i class="fas fa-leaf text-3xl text-green-400"></i>
+                        <p class="text-2xl font-bold font-heading tracking-wide">GreenLeaf</p>
+                    </div>
+                    <div class="flex items-center space-x-8 opacity-90">
+                        <div class="text-center">
+                            <i class="fab fa-aws text-4xl text-white hover:text-tech-orange transition-colors"></i>
+                            <p class="text-xs mt-1 text-gray-300">Provider</p>
+                        </div>
+                        <div class="h-8 w-px bg-gray-500"></div>
+                        <div class="text-center">
+                            <i class="fab fa-magento text-4xl text-white hover:text-magento transition-colors"></i>
+                            <p class="text-xs mt-1 text-gray-300">App</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Title Section -->
+                <div class="flex flex-col justify-center max-w-4xl mt-8">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <span class="px-3 py-1 bg-green-500 text-white text-xs font-bold uppercase rounded tracking-wider">Projet Cloud AWS</span>
+                        <span class="px-3 py-1 bg-gray-700 text-gray-300 text-xs font-bold uppercase rounded tracking-wider">Terraform</span>
+                        <span class="px-3 py-1 bg-gray-700 text-gray-300 text-xs font-bold uppercase rounded tracking-wider">Ansible</span>
+                    </div>
+                    <h1 class="text-6xl font-extrabold leading-tight mb-6 tracking-tight">
+                        Architecture<br/>
+                        <span class="text-green-400">E-commerce Magento</span><br/>
+                        sur AWS
+                    </h1>
+                    <div class="h-2 w-32 bg-gradient-to-r from-green-400 to-blue-500 rounded mb-6"></div>
+                    <p class="text-2xl text-gray-200 font-light max-w-3xl leading-relaxed">
+                        Déploiement haute disponibilité, scalable et sécurisé<br/>
+                        avec approche <span class="font-semibold text-white">Infrastructure as Code</span>.
+                    </p>
+                </div>
+                <!-- Footer / Meta Info -->
+                <div class="grid grid-cols-2 gap-8 items-end border-t border-gray-600 pt-8 mt-4">
+                    <div class="flex flex-col space-y-2">
+                        <p class="text-sm text-green-400 uppercase tracking-widest font-bold mb-1">Stack Technique</p>
+                        <div class="flex space-x-6 text-sm text-gray-200">
+                            <div class="flex items-center"><i class="fas fa-layer-group mr-2 text-gray-400"></i> Magento 2.4.7-p1</div>
+                            <div class="flex items-center"><i class="fas fa-globe-europe mr-2 text-gray-400"></i> Région eu-west-3</div>
+                            <div class="flex items-center"><i class="fab fa-linux mr-2 text-gray-400"></i> Ubuntu 22.04 LTS</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end text-right">
+                        <p class="text-sm text-gray-400 mb-1">Présenté par</p>
+                        <p class="text-lg font-bold text-white">Équipe DevOps / Cloud</p>
+                        <p class="text-sm text-green-400">9 Janvier 2026</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Context & Objectives -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col p-12 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-10 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-bullseye text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Contexte & Objectifs</h2>
+                            <p class="text-green-600 font-semibold mt-1">Projet de déploiement infrastructure Cloud</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 opacity-80">
+                        <i class="fas fa-leaf text-green-600"></i>
+                        <span class="font-bold text-gray-600">Projet GreenLeaf</span>
+                    </div>
+                </div>
+                <!-- Two Column Layout -->
+                <div class="flex flex-1 space-x-12">
+                    <!-- Left Column: Context & Objectives -->
+                    <div class="w-1/2 flex flex-col space-y-8">
+                        <!-- Project Context Box -->
+                        <div class="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-100">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-store text-green-600 mr-3"></i>
+                                Contexte Projet
+                            </h3>
+                            <p class="text-gray-600 leading-relaxed mb-4">
+                                GreenLeaf est une plateforme e-commerce de vente de produits écoresponsables. Ce projet étudiant vise à concevoir et déployer une infrastructure de production robuste pour supporter la boutique en ligne.
+                            </p>
+                            <div class="flex space-x-3">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold">E-commerce</span>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">Production-Ready</span>
+                            </div>
+                        </div>
+                        <!-- Strategic Objectives -->
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center border-b border-gray-200 pb-2">
+                                <i class="fas fa-tasks text-blue-600 mr-3"></i>
+                                Objectifs Stratégiques
+                            </h3>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <div class="bg-green-100 p-2 rounded-full mr-4 mt-1">
+                                        <i class="fas fa-heartbeat text-green-600 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Haute Disponibilité (HA)</p>
+                                        <p class="text-sm text-gray-600">Tolérance aux pannes avec architecture Multi-AZ</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="bg-blue-100 p-2 rounded-full mr-4 mt-1">
+                                        <i class="fas fa-expand-arrows-alt text-blue-600 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Scalabilité Automatique</p>
+                                        <p class="text-sm text-gray-600">Adaptation des ressources selon la charge (Auto Scaling)</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="bg-purple-100 p-2 rounded-full mr-4 mt-1">
+                                        <i class="fas fa-shield-alt text-purple-600 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Sécurité & Isolation</p>
+                                        <p class="text-sm text-gray-600">Architecture sécurisée par conception (VPC privé, WAF, HTTPS)</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="bg-yellow-100 p-2 rounded-full mr-4 mt-1">
+                                        <i class="fas fa-coins text-yellow-600 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Budget Maîtrisé</p>
+                                        <p class="text-sm text-gray-600">Optimisation des coûts pour un contexte étudiant/startup</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Right Column: Constraints & Tech Stack -->
+                    <div class="w-1/2 flex flex-col">
+                        <div class="bg-tech-light h-full rounded-2xl p-8 border-l-accent shadow-lg flex flex-col relative overflow-hidden">
+                            <!-- Background Icon -->
+                            <div class="absolute -right-10 -bottom-10 text-green-200 opacity-30 transform rotate-12">
+                                <i class="fas fa-cogs text-9xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-tech-green mb-8 font-heading">
+                                Cadre Technique & Contraintes
+                            </h3>
+                            <div class="space-y-8 relative z-10">
+                                <!-- Cloud Provider -->
+                                <div class="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-aws text-3xl text-orange-500 mr-4 w-10 text-center"></i>
+                                        <div>
+                                            <p class="font-bold text-gray-800">Cloud Provider</p>
+                                            <p class="text-sm text-gray-500">AWS Only</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs font-bold text-gray-400 uppercase">Région</p>
+                                        <p class="font-mono text-green-700 font-bold">eu-west-3 (Paris)</p>
+                                    </div>
+                                </div>
+                                <!-- Application -->
+                                <div class="flex items-center bg-white p-4 rounded-lg shadow-sm">
+                                    <i class="fab fa-magento text-3xl text-orange-600 mr-4 w-10 text-center"></i>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Application Cible</p>
+                                        <p class="text-sm text-gray-600">Magento Open Source 2.4.7-p1</p>
+                                    </div>
+                                </div>
+                                <!-- IaC Tools -->
+                                <div class="flex items-center bg-white p-4 rounded-lg shadow-sm">
+                                    <i class="fas fa-code text-3xl text-indigo-600 mr-4 w-10 text-center"></i>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-gray-800">Infrastructure as Code</p>
+                                        <div class="flex items-center mt-1 space-x-3">
+                                            <span class="flex items-center text-sm text-gray-600"><i class="fas fa-check-circle text-green-500 mr-1"></i> Terraform ≥ 1.6</span>
+                                            <span class="flex items-center text-sm text-gray-600"><i class="fas fa-check-circle text-green-500 mr-1"></i> Ansible</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- OS -->
+                                <div class="flex items-center bg-white p-4 rounded-lg shadow-sm">
+                                    <i class="fab fa-ubuntu text-3xl text-orange-700 mr-4 w-10 text-center"></i>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Système d'Exploitation</p>
+                                        <p class="text-sm text-gray-600">Ubuntu 22.04 LTS (Jammy Jellyfish)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Quote/Insight -->
+                            <div class="mt-auto pt-6 border-t border-green-200">
+                                <p class="italic text-green-800 text-sm font-medium">
+                                    "L'objectif n'est pas seulement de déployer, mais de garantir une infrastructure reproductible, maintenable et résiliente."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Architecture Overview -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-project-diagram text-2xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight font-heading">Vue d'ensemble de l'architecture</h2>
+                            <p class="text-green-600 font-semibold text-sm mt-0.5">Flux de données et composants Multi-AZ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 opacity-80">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded text-xs font-bold uppercase tracking-wider border border-gray-300">AWS Architecture</span>
+                    </div>
+                </div>
+                <!-- Main Diagram Area -->
+                <div class="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm relative overflow-hidden flex flex-col">
+                    <!-- Toolbar / Legend Strip -->
+                    <div class="bg-gray-50 border-b border-gray-200 px-6 py-3 flex justify-between items-center text-sm">
+                        <div class="flex space-x-6">
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span>Load Balancing</div>
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-orange-500 mr-2"></span>Compute (EC2)</div>
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>Database (RDS)</div>
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>Storage/CDN</div>
+                        </div>
+                        <div class="flex items-center text-gray-500 text-xs">
+                            <i class="fas fa-lock mr-1"></i> HTTPS/TLS Everywhere
+                        </div>
+                    </div>
+                    <!-- Diagram Content -->
+                    <div class="flex-1 relative bg-gray-50 grid-pattern p-4 flex justify-center items-center overflow-auto">
+                        <img alt="Diagramme d'architecture AWS GreenLeaf" class="w-full h-auto object-contain shadow-lg rounded-lg border border-gray-200 bg-white" style="max-width: 100%; max-height: calc(100vh - 200px);" src="Crer_un_diagramme_darchitecture_AWS_professionne-1767961374462.png"/>
+                        <!-- Floating Labels/Highlights -->
+                        <div class="absolute bottom-4 left-6 bg-white bg-opacity-90 p-3 rounded shadow border border-gray-200 text-xs max-w-xs z-10">
+                            <p class="font-bold text-gray-800 mb-1">Points Clés :</p>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>Distribution CloudFront globale</li>
+                                <li>ALB Public Multi-AZ</li>
+                                <li>Auto Scaling sur 2 AZs</li>
+                                <li>RDS Multi-AZ (Active/Standby)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer Note -->
+                <div class="mt-4 flex justify-between items-end text-sm">
+                    <div class="text-gray-500 italic max-w-3xl">
+                        <p><i class="fas fa-info-circle mr-2"></i>Le trafic utilisateur passe par CloudFront (CDN) avant d'atteindre l'Application Load Balancer. Les instances EC2 et la base de données RDS sont déployées sur plusieurs zones de disponibilité (Multi-AZ) pour garantir la tolérance aux pannes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: VPC Network Components -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col p-12 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-network-wired text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Composants Réseau (VPC)</h2>
+                            <p class="text-green-600 font-semibold mt-1">Fondation de l'infrastructure GreenLeaf</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 opacity-80">
+                        <i class="fas fa-leaf text-green-600"></i>
+                        <span class="font-bold text-gray-600">Projet GreenLeaf</span>
+                    </div>
+                </div>
+                <!-- Two Column Layout -->
+                <div class="flex flex-1 space-x-12">
+                    <!-- Left Column: VPC Architecture & Specs -->
+                    <div class="w-1/2 flex flex-col space-y-6">
+                        <!-- VPC Specs Box -->
+                        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-project-diagram text-green-600 mr-3"></i>
+                                Spécifications VPC
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <p class="text-xs text-gray-500 font-bold uppercase">CIDR Block</p>
+                                    <p class="font-mono text-lg font-bold text-gray-800">10.0.0.0/16</p>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <p class="text-xs text-gray-500 font-bold uppercase">DNS Support</p>
+                                    <p class="font-mono text-lg font-bold text-green-600">Activé</p>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg col-span-2">
+                                    <p class="text-xs text-gray-500 font-bold uppercase">Région</p>
+                                    <p class="font-bold text-gray-800">eu-west-3 (Paris)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Subnets Configuration -->
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-sitemap text-blue-600 mr-3"></i>
+                                Architecture Sous-réseaux Multi-AZ
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <span class="bg-blue-200 text-blue-800 text-xs font-bold px-2 py-1 rounded">AZ-a</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Subnet Public A</p>
+                                        <p class="text-sm text-gray-600 font-mono">10.0.1.0/24 (eu-west-3a)</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <span class="bg-blue-200 text-blue-800 text-xs font-bold px-2 py-1 rounded">AZ-b</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Subnet Public B</p>
+                                        <p class="text-sm text-gray-600 font-mono">10.0.2.0/24 (eu-west-3b)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center space-x-2 text-sm text-gray-600 bg-gray-100 p-2 rounded">
+                                <i class="fas fa-globe text-gray-500"></i>
+                                <p>Connectivité Internet via <strong>Internet Gateway (IGW)</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Security Groups & Isolation -->
+                    <div class="w-1/2 flex flex-col">
+                        <div class="bg-tech-light h-full rounded-2xl p-8 border-l-accent shadow-lg flex flex-col relative overflow-hidden">
+                            <!-- Background Icon -->
+                            <div class="absolute -right-10 -bottom-10 text-green-200 opacity-30 transform rotate-12">
+                                <i class="fas fa-shield-virus text-9xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-tech-green mb-6 font-heading flex items-center">
+                                <i class="fas fa-lock mr-3"></i>
+                                Sécurité Réseau (Security Groups)
+                            </h3>
+                            <div class="space-y-5 relative z-10 flex-1">
+                                <p class="text-gray-600 mb-4 text-sm">Approche de sécurité en profondeur avec isolation stricte des couches.</p>
+                                <!-- SG ALB -->
+                                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-purple-500">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h4 class="font-bold text-gray-800">ALB Security Group</h4>
+                                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full font-bold">Public</span>
+                                    </div>
+                                    <ul class="text-sm space-y-1">
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fas fa-sign-in-alt text-green-500 mr-2 w-4"></i>
+                                            <span>Inbound: <strong>80/443</strong> (Anywhere)</span>
+                                        </li>
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fas fa-sign-out-alt text-blue-500 mr-2 w-4"></i>
+                                            <span>Outbound: Vers EC2 SG</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- SG EC2 -->
+                                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-orange-500">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h4 class="font-bold text-gray-800">EC2 Security Group</h4>
+                                        <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-bold">App</span>
+                                    </div>
+                                    <ul class="text-sm space-y-1">
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fas fa-sign-in-alt text-green-500 mr-2 w-4"></i>
+                                            <span>Inbound: <strong>80/443</strong> (Depuis ALB SG uniquement)</span>
+                                        </li>
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fas fa-sign-in-alt text-gray-400 mr-2 w-4"></i>
+                                            <span>Inbound: <strong>22 (SSH)</strong> (Depuis Bastion/VPN - optionnel)</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- SG RDS -->
+                                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-600">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h4 class="font-bold text-gray-800">RDS Security Group</h4>
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-bold">Data</span>
+                                    </div>
+                                    <ul class="text-sm space-y-1">
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fas fa-sign-in-alt text-green-500 mr-2 w-4"></i>
+                                            <span>Inbound: <strong>3306 (MySQL)</strong> (Depuis EC2 SG uniquement)</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Application Layer -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-server text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Couche Applicative</h2>
+                            <p class="text-green-600 font-semibold mt-1">Équilibrage de charge & Scalabilité automatique</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold uppercase tracking-wider border border-purple-200">ALB</span>
+                        <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold uppercase tracking-wider border border-orange-200">EC2 Auto Scaling</span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Icon Bullets List -->
+                    <div class="w-7/12 flex flex-col space-y-5">
+                        <!-- Item 1: ALB -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-purple"></div>
+                            <div class="bg-purple-50 p-3 rounded-full mr-5 group-hover:bg-purple-100 transition-colors">
+                                <i class="fas fa-network-wired text-2xl text-aws-purple"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Application Load Balancer (ALB)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Point d'entrée public unique distribué sur plusieurs AZ.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-lock mr-1 text-green-500"></i>HTTPS (ACM)</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Redirection 80→443</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2: Auto Scaling -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-orange"></div>
+                            <div class="bg-orange-50 p-3 rounded-full mr-5 group-hover:bg-orange-100 transition-colors">
+                                <i class="fas fa-arrows-alt-h text-2xl text-aws-orange"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Auto Scaling Group</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Gestion dynamique de la capacité pour absorber les pics de charge.</p>
+                                <div class="flex gap-4 font-mono text-sm text-gray-700 bg-gray-50 p-2 rounded w-max">
+                                    <span>Min: <b>1</b></span>
+                                    <span class="text-gray-300">|</span>
+                                    <span>Desired: <b>1</b></span>
+                                    <span class="text-gray-300">|</span>
+                                    <span>Max: <b>2</b></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3: EC2 Instances -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-orange"></div>
+                            <div class="bg-orange-50 p-3 rounded-full mr-5 group-hover:bg-orange-100 transition-colors">
+                                <i class="fas fa-cube text-2xl text-aws-orange"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Instances de Calcul (EC2)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                Instances <b>t3.small</b> (2 vCPU / 2 Go RAM) pour stabilité Magento.
+                                <br/>OS: Ubuntu 22.04 LTS configuré via Ansible.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Item 4: Health Checks -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <i class="fas fa-heartbeat text-2xl text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Health Checks & Résilience</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Surveillance continue via ALB. Remplacement automatique des instances non saines en &lt; 60s.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Visual Summary -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gradient-to-br from-gray-50 to-green-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-cogs text-9xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
+                                Configuration Cible
+                            </h3>
+                            <!-- Spec Table -->
+                            <div class="space-y-4 flex-1">
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">Instance Type</span>
+                                    <span class="font-mono text-purple-700 bg-purple-50 px-2 py-1 rounded text-sm font-bold">t3.small</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">Scaling Metric</span>
+                                    <span class="text-gray-800 text-sm">CPU Utilisation &gt; 70%</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">AMI</span>
+                                    <span class="text-gray-800 text-sm flex items-center"><i class="fab fa-ubuntu text-orange-700 mr-2"></i> Ubuntu 22.04</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">SSL/TLS</span>
+                                    <span class="text-green-600 text-sm font-bold flex items-center"><i class="fas fa-lock mr-2"></i> ACM Cert</span>
+                                </div>
+                            </div>
+                            <!-- Security Focus Box -->
+                            <div class="mt-auto bg-white rounded-lg p-4 border-l-4 border-green-500 shadow-sm">
+                                <h4 class="text-green-800 font-bold text-sm mb-1 flex items-center">
+                                    <i class="fas fa-shield-alt mr-2"></i> Sécurité Réseau
+                                </h4>
+                                <p class="text-xs text-gray-600 leading-snug">
+                                    Les instances EC2 sont dans des sous-réseaux privés (ou publics sécurisés par SG) et n'acceptent du trafic HTTP/HTTPS que depuis l'ALB.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Database -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="fas fa-database text-3xl text-blue-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Base de Données</h2>
+                            <p class="text-blue-600 font-semibold mt-1">Amazon RDS MariaDB Multi-AZ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold uppercase tracking-wider border border-blue-200">RDS</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase tracking-wider border border-green-200">MariaDB</span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Icon Bullets List -->
+                    <div class="w-7/12 flex flex-col space-y-5">
+                        <!-- Item 1: RDS Config -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-blue"></div>
+                            <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
+                                <i class="fas fa-server text-2xl text-aws-blue"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Configuration Instance</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Instance optimisée pour la stabilité avec performances garanties.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">db.t3.small</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Multi-AZ</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">MariaDB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2: High Availability -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-blue"></div>
+                            <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
+                                <i class="fas fa-sync-alt text-2xl text-aws-blue"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Haute Disponibilité (Multi-AZ)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Réplication synchrone vers une instance standby dans une autre AZ.</p>
+                                <div class="flex gap-4 font-mono text-sm text-gray-700 bg-gray-50 p-2 rounded w-max">
+                                    <span class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i>Failover auto</span>
+                                    <span class="text-gray-300">|</span>
+                                    <span>RTO &lt; 5 min</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3: Backup & Recovery -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <i class="fas fa-history text-2xl text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Sauvegardes & Rétention</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Stratégie de backup automatisée pour garantir l'intégrité des données.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded border border-green-200">Rétention 7 jours</span>
+                                    <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded border border-green-200">Snapshots auto</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 4: Security -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-orange"></div>
+                            <div class="bg-orange-50 p-3 rounded-full mr-5 group-hover:bg-orange-100 transition-colors">
+                                <i class="fas fa-lock text-2xl text-aws-orange"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Sécurité & Accès</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Base de données isolée, non accessible publiquement.
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1"><i class="fas fa-shield-alt mr-1"></i> Accès restreint aux Security Groups EC2 uniquement</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Visual Summary -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gradient-to-br from-blue-50 to-white h-full rounded-2xl border border-blue-100 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-database text-9xl text-blue-900"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-blue-200 pb-2 text-blue-900">
+                                Architecture BDD
+                            </h3>
+                            <!-- Architecture Diagram Placeholder/Representation -->
+                            <div class="flex-1 flex flex-col justify-center items-center space-y-6 relative">
+                                <!-- Primary AZ -->
+                                <div class="w-full bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500 relative z-10">
+                                    <div class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">AZ A (Primary)</div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-database text-3xl text-blue-600 mr-3"></i>
+                                        <div>
+                                            <div class="font-bold text-gray-800">RDS Master</div>
+                                            <div class="text-xs text-green-600 font-semibold">Read / Write</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Replication Link -->
+                                <div class="h-8 border-l-2 border-dashed border-blue-300 ml-8 relative">
+                                    <div class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-blue-50 px-2 py-1 rounded text-xs text-blue-600 font-mono whitespace-nowrap">
+                                        <i class="fas fa-sync fa-spin mr-1"></i> Sync Replication
+                                    </div>
+                                </div>
+                                <!-- Secondary AZ -->
+                                <div class="w-full bg-gray-50 p-4 rounded-lg shadow-sm border-l-4 border-gray-400 opacity-90 relative z-10">
+                                    <div class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">AZ B (Standby)</div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-database text-3xl text-gray-400 mr-3"></i>
+                                        <div>
+                                            <div class="font-bold text-gray-600">RDS Standby</div>
+                                            <div class="text-xs text-gray-500 font-semibold">Failover Target</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Bottom Note -->
+                            <div class="mt-6 bg-blue-50 rounded-lg p-3 border border-blue-100">
+                                <p class="text-xs text-blue-800 leading-snug text-center font-semibold">
+                                    <i class="fas fa-info-circle mr-1"></i> 
+                                    En cas de panne AZ-A, bascule automatique DNS vers AZ-B sans intervention manuelle.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Storage & CDN -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-network-wired text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Stockage Médias & CDN</h2>
+                            <p class="text-green-600 font-semibold mt-1">Performance globale & Optimisation des coûts</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded text-xs font-bold uppercase tracking-wider border border-green-200">S3</span>
+                        <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold uppercase tracking-wider border border-orange-200">CloudFront</span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Icon Bullets List -->
+                    <div class="w-7/12 flex flex-col space-y-5">
+                        <!-- Item 1: S3 -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-green"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <i class="fas fa-hdd text-2xl text-aws-green"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Amazon S3 (Stockage Médias)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Stockage centralisé et durable pour les images produits Magento et assets statiques.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-images mr-1 text-green-500"></i>media/catalog</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">99.99% Durabilité</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2: CloudFront -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-orange"></div>
+                            <div class="bg-orange-50 p-3 rounded-full mr-5 group-hover:bg-orange-100 transition-colors">
+                                <i class="fas fa-globe text-2xl text-aws-orange"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">CloudFront (CDN)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Mise en cache du contenu aux points de présence (Edge Locations) pour réduire la latence.</p>
+                                <div class="flex gap-2 text-sm text-gray-700">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-bolt mr-1 text-orange-500"></i>Cache Hit élevé</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Compression Gzip/Brotli</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3: Lifecycle Policies -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-blue"></div>
+                            <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
+                                <i class="fas fa-clock text-2xl text-aws-blue"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Lifecycle Policies & Coûts</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Automatisation du cycle de vie des données pour optimiser les coûts de stockage.
+                                </p>
+                                <div class="mt-2 text-xs text-gray-500 flex items-center">
+                                    <i class="fas fa-arrow-right mr-1 text-blue-400"></i> Standard → Intelligent Tiering → Glacier
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 4: Security -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-600"></div>
+                            <div class="bg-gray-100 p-3 rounded-full mr-5 group-hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-user-shield text-2xl text-gray-700"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Origin Access Control (OAC)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Le bucket S3 est privé. Seule la distribution CloudFront est autorisée à lire les objets via OAC.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Visual Summary -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gray-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-share-alt text-9xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
+                                Stratégie de Distribution
+                            </h3>
+                            <!-- Spec Table -->
+                            <div class="space-y-4 flex-1">
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">Origin Source</span>
+                                    <span class="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-sm font-bold">S3 Bucket</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">Viewer Protocol</span>
+                                    <span class="text-gray-800 text-sm">Redirect HTTP to HTTPS</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">Cache Patterns</span>
+                                    <span class="text-gray-800 text-sm font-mono text-xs">/media/*, /static/*</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <span class="text-gray-600 text-sm font-semibold">Price Class</span>
+                                    <span class="text-orange-600 text-sm font-bold flex items-center">Use All Edge Locations</span>
+                                </div>
+                            </div>
+                            <!-- Performance Focus Box -->
+                            <div class="mt-auto bg-white rounded-lg p-4 border-l-4 border-orange-500 shadow-sm">
+                                <h4 class="text-orange-800 font-bold text-sm mb-1 flex items-center">
+                                    <i class="fas fa-tachometer-alt mr-2"></i> Gain de Performance
+                                </h4>
+                                <p class="text-xs text-gray-600 leading-snug">
+                                    Le déchargement des assets statiques vers le CDN réduit la charge CPU des instances EC2 d'environ 40% et améliore drastiquement le temps de chargement.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Monitoring & Observability -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-pink-100 p-3 rounded-lg">
+                            <i class="fas fa-chart-line text-3xl text-pink-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Monitoring & Observabilité</h2>
+                            <p class="text-pink-700 font-semibold mt-1">Surveillance proactive & Centralisation des logs</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-pink-100 text-pink-700 rounded text-xs font-bold uppercase tracking-wider border border-pink-200">CloudWatch</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-bold uppercase tracking-wider border border-red-200">SNS</span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Icon Bullets List -->
+                    <div class="w-7/12 flex flex-col space-y-5">
+                        <!-- Item 1: Metrics -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-cloudwatch"></div>
+                            <div class="bg-pink-50 p-3 rounded-full mr-5 group-hover:bg-pink-100 transition-colors">
+                                <i class="fas fa-tachometer-alt text-2xl text-aws-cloudwatch"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">CloudWatch Metrics</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Suivi en temps réel des performances de l'infrastructure.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-microchip mr-1 text-gray-500"></i>EC2 CPU</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-database mr-1 text-blue-500"></i>RDS IOPS</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-network-wired mr-1 text-purple-500"></i>ALB RequestCount</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2: Alarms & SNS -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500"></div>
+                            <div class="bg-red-50 p-3 rounded-full mr-5 group-hover:bg-red-100 transition-colors">
+                                <i class="fas fa-bell text-2xl text-red-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Alarmes & Notifications (SNS)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Alertes automatiques en cas d'anomalies critiques.</p>
+                                <div class="flex gap-2 font-mono text-xs text-gray-700">
+                                    <span class="bg-red-50 px-2 py-1 rounded border border-red-100">CPU &gt; 80%</span>
+                                    <span class="bg-red-50 px-2 py-1 rounded border border-red-100">HTTP 5xx &gt; 1%</span>
+                                    <span class="bg-red-50 px-2 py-1 rounded border border-red-100">RDS Free Storage &lt; 2GB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3: Logs -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-600"></div>
+                            <div class="bg-gray-100 p-3 rounded-full mr-5 group-hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-file-alt text-2xl text-gray-700"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">CloudWatch Logs Centralisés</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Agrégation des logs applicatifs pour faciliter le debugging sans accès SSH.
+                                </p>
+                                <div class="mt-2 text-xs text-gray-500 italic">
+                                    /var/log/nginx/* • /var/log/php-fpm/* • Magento system.log
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 4: Dashboard -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <i class="fas fa-columns text-2xl text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Dashboard Unifié</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Vue d'ensemble de la santé du système (EC2 + RDS + ALB) sur un seul écran.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Visual Summary -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gradient-to-br from-gray-50 to-pink-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-chart-area text-9xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
+                                Architecture de Surveillance
+                            </h3>
+                            <!-- Monitoring Flow Diagram Representation -->
+                            <div class="flex-1 flex flex-col justify-center space-y-6 relative">
+                                <!-- Sources -->
+                                <div class="flex justify-center space-x-4">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-white rounded-lg shadow flex items-center justify-center mx-auto mb-2 border border-orange-200">
+                                            <i class="fas fa-server text-orange-500"></i>
+                                        </div>
+                                        <span class="text-xs font-bold text-gray-600">EC2</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-white rounded-lg shadow flex items-center justify-center mx-auto mb-2 border border-blue-200">
+                                            <i class="fas fa-database text-blue-500"></i>
+                                        </div>
+                                        <span class="text-xs font-bold text-gray-600">RDS</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-white rounded-lg shadow flex items-center justify-center mx-auto mb-2 border border-purple-200">
+                                            <i class="fas fa-network-wired text-purple-500"></i>
+                                        </div>
+                                        <span class="text-xs font-bold text-gray-600">ALB</span>
+                                    </div>
+                                </div>
+                                <!-- Arrow Down -->
+                                <div class="flex justify-center">
+                                    <i class="fas fa-arrow-down text-gray-300"></i>
+                                </div>
+                                <!-- Central Hub -->
+                                <div class="bg-white p-4 rounded-xl shadow-md border border-pink-200 text-center relative z-10">
+                                    <i class="fas fa-cloud text-pink-500 text-3xl mb-2"></i>
+                                    <h4 class="font-bold text-gray-800 text-sm">Amazon CloudWatch</h4>
+                                    <p class="text-xs text-gray-500">Metrics • Logs • Events</p>
+                                </div>
+                                <!-- Arrow Down -->
+                                <div class="flex justify-center">
+                                    <i class="fas fa-arrow-down text-gray-300"></i>
+                                </div>
+                                <!-- Actions -->
+                                <div class="flex justify-center space-x-6">
+                                    <div class="text-center bg-red-50 p-2 rounded border border-red-100">
+                                        <i class="fas fa-envelope text-red-500 mb-1"></i>
+                                        <p class="text-xs font-bold text-red-700">Email SNS</p>
+                                    </div>
+                                    <div class="text-center bg-green-50 p-2 rounded border border-green-100">
+                                        <i class="fas fa-sync text-green-500 mb-1"></i>
+                                        <p class="text-xs font-bold text-green-700">Auto Scaling</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Alert Box -->
+                            <div class="mt-auto bg-white rounded-lg p-4 border-l-4 border-red-500 shadow-sm mt-4">
+                                <h4 class="text-red-800 font-bold text-sm mb-1 flex items-center">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i> Réactivité
+                                </h4>
+                                <p class="text-xs text-gray-600 leading-snug">
+                                    Le système réagit automatiquement à la charge (Scale Out) et notifie les administrateurs par email en cas de panne critique.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Security & Compliance -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-shield-alt text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Sécurité & Conformité</h2>
+                            <p class="text-green-600 font-semibold mt-1">Protection des données et contrôles d'accès</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-bold uppercase tracking-wider border border-red-200">IAM</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold uppercase tracking-wider border border-blue-200">KMS</span>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold uppercase tracking-wider border border-gray-200">SG</span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Icon Bullets List -->
+                    <div class="w-7/12 flex flex-col space-y-5">
+                        <!-- Item 1: Security Groups -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-shield"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <i class="fas fa-network-wired text-2xl text-aws-shield"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Security Groups Restrictifs</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Principe du moindre privilège appliqué au niveau réseau.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-check mr-1 text-green-500"></i>ALB: 80/443 (Public)</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-check mr-1 text-green-500"></i>EC2: 80 (Depuis ALB)</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-check mr-1 text-green-500"></i>RDS: 3306 (Depuis EC2)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2: IAM -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-iam"></div>
+                            <div class="bg-red-50 p-3 rounded-full mr-5 group-hover:bg-red-100 transition-colors">
+                                <i class="fas fa-id-card-alt text-2xl text-aws-iam"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Gestion des Identités (IAM)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Rôles et permissions granulaires.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Rôle EC2 pour S3/Secrets</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Utilisateur Terraform dédié</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3: Secrets Manager -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-kms"></div>
+                            <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
+                                <i class="fas fa-key text-2xl text-blue-800"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Gestion des Secrets</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Utilisation d'<b>AWS Secrets Manager</b> pour les credentials de base de données et clés API Magento. Rotation automatique supportée.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Item 4: Encryption -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-600"></div>
+                            <div class="bg-gray-100 p-3 rounded-full mr-5 group-hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-lock text-2xl text-gray-700"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Chiffrement de Bout en Bout</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Données chiffrées au repos (EBS, S3, RDS) et en transit (TLS/SSL via ACM pour ALB/CloudFront).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Visual Summary -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gradient-to-br from-gray-50 to-red-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-user-shield text-9xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
+                                Matrice de Sécurité
+                            </h3>
+                            <!-- Spec Table -->
+                            <div class="space-y-4 flex-1">
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm border-l-4 border-red-500">
+                                    <span class="text-gray-600 text-sm font-semibold">IAM Policies</span>
+                                    <span class="text-gray-800 text-sm font-bold">Least Privilege</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm border-l-4 border-blue-500">
+                                    <span class="text-gray-600 text-sm font-semibold">Secrets DB</span>
+                                    <span class="text-gray-800 text-sm">Secrets Manager</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm border-l-4 border-green-500">
+                                    <span class="text-gray-600 text-sm font-semibold">Trafic Web</span>
+                                    <span class="text-gray-800 text-sm flex items-center"><i class="fas fa-lock text-green-600 mr-2"></i> HTTPS Only</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm border-l-4 border-gray-500">
+                                    <span class="text-gray-600 text-sm font-semibold">Stockage</span>
+                                    <span class="text-gray-800 text-sm">AES-256 (S3/EBS)</span>
+                                </div>
+                            </div>
+                            <!-- Security Focus Box -->
+                            <div class="mt-auto bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <h4 class="text-gray-800 font-bold text-sm mb-2 flex items-center">
+                                    <i class="fas fa-exclamation-circle text-orange-500 mr-2"></i> Conformité
+                                </h4>
+                                <p class="text-xs text-gray-600 leading-snug">
+                                    L'architecture respecte les bonnes pratiques AWS Well-Architected Framework (pilier Sécurité) en isolant les ressources critiques dans des sous-réseaux privés.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Infrastructure as Code -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-6 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-indigo-100 p-3 rounded-lg">
+                            <i class="fas fa-code-branch text-2xl text-indigo-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight font-heading">Infrastructure as Code</h2>
+                            <p class="text-indigo-600 font-semibold text-sm mt-0.5">Pipeline d'automatisation Terraform & Ansible</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded text-xs font-bold uppercase tracking-wider border border-gray-300">
+                            <i class="fas fa-clock mr-1"></i> Déploiement: ~15-20 min
+                        </span>
+                    </div>
+                </div>
+                <!-- Timeline Section -->
+                <div class="relative flex flex-col justify-center" style="min-height: 0; flex: 0 1 auto;">
+                    <!-- Timeline Background Line -->
+                    <div class="absolute top-1/2 left-[50px] right-[50px] h-1 bg-gray-200 transform -translate-y-1/2 z-0"></div>
+                    <div class="absolute top-1/2 left-[50px] w-[85%] h-1 bg-green-500 transform -translate-y-1/2 z-0"></div>
+                    <!-- Steps Container -->
+                    <div class="relative z-10 flex justify-between px-12 w-full py-4">
+                        <!-- Step 1: Terraform Init/Plan -->
+                        <div class="flex flex-col items-center w-64 group">
+                            <div class="w-16 h-16 bg-white border-4 border-purple-600 rounded-full flex items-center justify-center shadow-lg mb-4 transform group-hover:scale-110 transition-transform duration-300 relative z-20">
+                                <i class="fas fa-drafting-compass text-2xl text-purple-600"></i>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-purple-500 w-full hover:shadow-lg transition-shadow">
+                                <h3 class="font-bold text-gray-800 text-lg mb-1">1. Provisionning</h3>
+                                <p class="text-xs font-bold text-purple-600 uppercase mb-2">Terraform</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                                    <li>VPC & Réseau</li>
+                                    <li>Security Groups</li>
+                                    <li>RDS & S3</li>
+                                    <li>Load Balancer (ALB)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Step 2: Instance Config -->
+                        <div class="flex flex-col items-center w-64 group">
+                            <div class="w-16 h-16 bg-white border-4 border-indigo-600 rounded-full flex items-center justify-center shadow-lg mb-4 transform group-hover:scale-110 transition-transform duration-300 relative z-20">
+                                <i class="fas fa-server text-2xl text-indigo-600"></i>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-indigo-500 w-full hover:shadow-lg transition-shadow">
+                                <h3 class="font-bold text-gray-800 text-lg mb-1">2. Configuration</h3>
+                                <p class="text-xs font-bold text-indigo-600 uppercase mb-2">Ansible</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                                    <li>Nginx & PHP-FPM</li>
+                                    <li>Composer Install</li>
+                                    <li>Magento Setup</li>
+                                    <li>Redis (Optionnel)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Step 3: Application Deploy -->
+                        <div class="flex flex-col items-center w-64 group">
+                            <div class="w-16 h-16 bg-white border-4 border-blue-500 rounded-full flex items-center justify-center shadow-lg mb-4 transform group-hover:scale-110 transition-transform duration-300 relative z-20">
+                                <i class="fab fa-magento text-2xl text-orange-600"></i>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-blue-500 w-full hover:shadow-lg transition-shadow">
+                                <h3 class="font-bold text-gray-800 text-lg mb-1">3. Déploiement</h3>
+                                <p class="text-xs font-bold text-blue-600 uppercase mb-2">Post-Install</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                                    <li>Compilation Assets</li>
+                                    <li>Migration DB</li>
+                                    <li>Cache Flush</li>
+                                    <li>Health Check OK</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Step 4: Scale & Monitor -->
+                        <div class="flex flex-col items-center w-64 group">
+                            <div class="w-16 h-16 bg-white border-4 border-green-500 rounded-full flex items-center justify-center shadow-lg mb-4 transform group-hover:scale-110 transition-transform duration-300 relative z-20">
+                                <i class="fas fa-chart-line text-2xl text-green-600"></i>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-green-500 w-full hover:shadow-lg transition-shadow">
+                                <h3 class="font-bold text-gray-800 text-lg mb-1">4. Production</h3>
+                                <p class="text-xs font-bold text-green-600 uppercase mb-2">CloudWatch / ASG</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                                    <li>Auto Scaling (1-2)</li>
+                                    <li>CloudWatch Alarms</li>
+                                    <li>Log Streaming</li>
+                                    <li>Backup Auto</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bottom Highlights -->
+                <div class="grid grid-cols-3 gap-6 mt-4 mb-4">
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-center border border-gray-200">
+                        <i class="fas fa-sync-alt text-blue-500 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">Idempotence</p>
+                            <p class="text-xs text-gray-500">Exécutions répétables sans effets de bord</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-center border border-gray-200">
+                        <i class="fas fa-lock text-purple-500 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">Secrets Manager</p>
+                            <p class="text-xs text-gray-500">Pas de credentials en clair dans le code</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-center border border-gray-200">
+                        <i class="fab fa-git-alt text-orange-600 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">Version Control</p>
+                            <p class="text-xs text-gray-500">Infrastructure versionnée (Git)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Deployment Guide -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="fas fa-rocket text-3xl text-blue-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Guide de Déploiement</h2>
+                            <p class="text-blue-600 font-semibold mt-1">Processus de déploiement étape par étape</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded text-xs font-bold uppercase tracking-wider border border-gray-300">
+                            <i class="fas fa-clock mr-1"></i> ~15-20 min
+                        </span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Steps -->
+                    <div class="w-7/12 flex flex-col space-y-5">
+                        <!-- Step 1: Prerequisites -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500"></div>
+                            <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
+                                <span class="text-xl font-bold text-blue-600">1</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Prérequis</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Configuration de l'environnement de déploiement.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fab fa-aws mr-1 text-orange-500"></i>AWS CLI configuré</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-code mr-1 text-purple-500"></i>Terraform ≥ 1.6</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-terminal mr-1 text-green-500"></i>Ansible</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Step 2: Variables -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-500"></div>
+                            <div class="bg-purple-50 p-3 rounded-full mr-5 group-hover:bg-purple-100 transition-colors">
+                                <span class="text-xl font-bold text-purple-600">2</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Variables Sensibles</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Configuration des secrets via terraform.tfvars ou variables d'environnement.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">db_password</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">magento_admin_password</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Step 3: Deployment -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <span class="text-xl font-bold text-green-600">3</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Déploiement</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Exécution des commandes Terraform pour créer l'infrastructure.</p>
+                                <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs mt-2">
+                                    <div class="mb-1">$ cd greenleaf-infra/terraform</div>
+                                    <div class="mb-1">$ terraform init</div>
+                                    <div>$ terraform apply</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Step 4: Validation -->
+                        <div class="flex items-start p-5 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-orange-500"></div>
+                            <div class="bg-orange-50 p-3 rounded-full mr-5 group-hover:bg-orange-100 transition-colors">
+                                <span class="text-xl font-bold text-orange-600">4</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Validation & Tests</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Vérification du déploiement via scripts de validation et accès à l'application.
+                                </p>
+                                <div class="flex items-center mt-2 text-xs text-gray-500">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span>Script validate.sh • Accès via ALB DNS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Quick Reference -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gradient-to-br from-gray-50 to-blue-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-terminal text-9xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
+                                Référence Rapide
+                            </h3>
+                            <!-- Commands Box -->
+                            <div class="space-y-4 flex-1">
+                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="text-sm font-bold text-gray-700 mb-2 flex items-center">
+                                        <i class="fas fa-download text-blue-500 mr-2"></i> Récupérer les Outputs
+                                    </h4>
+                                    <div class="bg-gray-900 text-green-400 p-2 rounded font-mono text-xs">
+                                        <div>$ terraform output</div>
+                                        <div>$ terraform output -raw alb_dns_name</div>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="text-sm font-bold text-gray-700 mb-2 flex items-center">
+                                        <i class="fas fa-sync-alt text-purple-500 mr-2"></i> Mise à Jour
+                                    </h4>
+                                    <p class="text-xs text-gray-600 leading-relaxed">
+                                        Modifier variables → <code class="bg-gray-100 px-1 rounded">terraform apply</code>
+                                        <br/>Pour Ansible : push Git → nouvelles instances appliquent auto
+                                    </p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="text-sm font-bold text-gray-700 mb-2 flex items-center">
+                                        <i class="fas fa-trash-alt text-red-500 mr-2"></i> Destruction
+                                    </h4>
+                                    <div class="bg-gray-900 text-red-400 p-2 rounded font-mono text-xs">
+                                        <div>$ terraform destroy</div>
+                                        <div class="text-gray-500 text-xs mt-1">ou ../scripts/destroy.sh</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Scripts Box -->
+                            <div class="mt-auto bg-white rounded-lg p-4 border-l-4 border-green-500 shadow-sm">
+                                <h4 class="text-green-800 font-bold text-sm mb-1 flex items-center">
+                                    <i class="fas fa-file-code mr-2"></i> Scripts Disponibles
+                                </h4>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">bootstrap.sh</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">validate.sh</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 font-mono">destroy.sh</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Costs & FinOps -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-2">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-file-invoice-dollar text-2xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight font-heading">Estimation des Coûts & FinOps</h2>
+                            <p class="text-green-600 font-semibold text-sm mt-0.5">Budget mensuel prévisionnel pour l'infrastructure</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 opacity-80">
+                        <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 flex flex-col items-end">
+                            <span class="text-xs text-blue-600 font-bold uppercase">Total Estimé</span>
+                            <span class="text-2xl font-bold text-blue-800 leading-none">$291.50 <span class="text-sm font-normal text-gray-500">/mois</span></span>
+                        </div>
+                        <div class="bg-green-50 px-4 py-2 rounded-lg border border-green-100 flex flex-col items-end">
+                            <span class="text-xs text-green-600 font-bold uppercase">Optimisé</span>
+                            <span class="text-xl font-bold text-green-800 leading-none">$254.90 <span class="text-xs font-normal text-gray-500">/mois</span></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex-1 flex space-x-8">
+                    <!-- Left Column: Detailed Table -->
+                    <div class="w-3/5 flex flex-col">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1">
+                            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-700">Détail par Service</h3>
+                                <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">Région: eu-west-3</span>
+                            </div>
+                            <table class="w-full text-left border-collapse cost-table">
+                                <thead>
+                                    <tr>
+                                        <th class="px-6 py-3">Service</th>
+                                        <th class="px-6 py-3">Configuration</th>
+                                        <th class="px-6 py-3 text-right">Coût Est. (USD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-database text-blue-500 w-6"></i> Amazon RDS
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>MariaDB, db.t3.small</p>
+                                            <p class="text-xs text-gray-400">Multi-AZ, Haute Disponibilité</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$72.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-server text-orange-500 w-6"></i> EC2 (Web)
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>2x t3.small (Linux)</p>
+                                            <p class="text-xs text-gray-400">2 vCPU / 2 Go RAM (stabilité Magento)</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$33.60</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-server text-orange-500 w-6"></i> EC2 (Search)
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>1x t3.small</p>
+                                            <p class="text-xs text-gray-400">OpenSearch auto-hébergé</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$16.80</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-network-wired text-purple-500 w-6"></i> VPC (NAT)
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>2x NAT Gateways</p>
+                                            <p class="text-xs text-gray-400">Sécurisation subnets privés (2 AZ)</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$74.40</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-network-wired text-indigo-500 w-6"></i> Load Balancer
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>Application Load Balancer</p>
+                                            <p class="text-xs text-gray-400">730h/mois + traitement trafic</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$26.50</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-bolt text-red-500 w-6"></i> ElastiCache
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>cache.t3.micro (Redis)</p>
+                                            <p class="text-xs text-gray-400">Cache de session Magento</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$13.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-globe text-green-500 w-6"></i> Data Transfer
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>Trafic Sortant Internet</p>
+                                            <p class="text-xs text-gray-400">~500 Go (avec compression)</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$45.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 flex items-center font-semibold text-gray-700">
+                                            <i class="fas fa-hdd text-gray-500 w-6"></i> Stockage & Monitoring
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600">
+                                            <p>EBS gp3 + EFS + CloudWatch</p>
+                                            <p class="text-xs text-gray-400">Volumes racines, médias, logs</p>
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-mono text-gray-800">$10.20</td>
+                                    </tr>
+                                    <tr class="bg-gray-100">
+                                        <td class="px-6 py-4 font-bold text-gray-800" colspan="2">TOTAL MENSUEL ESTIMÉ (Pay-As-You-Go)</td>
+                                        <td class="px-6 py-4 text-right font-bold text-blue-700 font-mono text-lg">$291.50</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Right Column: Chart & Optimizations -->
+                    <div class="w-2/5 flex flex-col space-y-6">
+                        <!-- Chart Container -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center justify-center flex-1 min-h-[250px]">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 w-full text-left">Répartition des coûts</h4>
+                            <div class="relative w-full h-64">
+                                <canvas id="costChart"></canvas>
+                            </div>
+                        </div>
+                        <!-- FinOps Optimizations Box -->
+                        <div class="bg-tech-light rounded-xl p-5 border-l-accent shadow-sm">
+                            <h4 class="text-green-800 font-bold mb-3 flex items-center">
+                                <i class="fas fa-piggy-bank mr-2"></i> Stratégies d'Optimisation
+                            </h4>
+                            <ul class="space-y-2 text-sm text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
+                                    <p><strong>Right-Sizing :</strong> t3.small pour stabilité Magento (vs t3.micro OOM).</p>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
+                                    <p><strong>Compression :</strong> Gzip/Brotli réduit trafic sortant de 70%.</p>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
+                                    <p><strong>Savings Plans :</strong> Économie ~30% avec engagement 1 an.</p>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
+                                    <p><strong>Budget :</strong> Alerte configurée à 350$ (70% du budget 500$).</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer Pagination -->
+                <div class="mt-auto flex justify-between items-end pt-4">
+                    <p class="text-xs text-gray-400 italic">Estimation basée sur les prix publics AWS (eu-west-3) au 01/2026. Activité 24/7 (730h) en Production HA. Budget: 500$ (Marge: +208$).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Architecture Highlights -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-star text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Points Forts de l'Architecture</h2>
+                            <p class="text-green-600 font-semibold mt-1">Valeur ajoutée technique et fonctionnelle</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 opacity-80">
+                        <span class="px-4 py-1.5 bg-green-50 text-green-800 rounded-full text-xs font-bold uppercase tracking-wider border border-green-200">
+                            <i class="fas fa-check-circle mr-2"></i>Production Ready
+                        </span>
+                    </div>
+                </div>
+                <!-- Grid Content -->
+                <div class="flex-1 grid grid-cols-3 gap-6">
+                    <!-- Card 1: Résilience -->
+                    <div class="highlight-card bg-white rounded-xl p-6 shadow-md border-t-4 border-blue-500 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 text-blue-100 text-6xl opacity-20 -z-0">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="flex items-center mb-4 z-10">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                                <i class="fas fa-server text-xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 font-heading">Haute Résilience</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed z-10">
+                            Architecture entièrement <strong>Multi-AZ</strong> (EC2, RDS, ALB) assurant une disponibilité continue même en cas de perte d'une zone complète.
+                        </p>
+                        <div class="mt-auto pt-4 flex items-center text-xs font-semibold text-blue-600">
+                            <i class="fas fa-arrow-right mr-2"></i> RTO &lt; 5 min
+                        </div>
+                    </div>
+                    <!-- Card 2: Scalabilité -->
+                    <div class="highlight-card bg-white rounded-xl p-6 shadow-md border-t-4 border-orange-500 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 text-orange-100 text-6xl opacity-20 -z-0">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                        <div class="flex items-center mb-4 z-10">
+                            <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mr-4">
+                                <i class="fas fa-expand-arrows-alt text-xl text-orange-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 font-heading">Scalabilité Auto</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed z-10">
+                            <strong>Auto Scaling Group</strong> réactif basé sur la charge CPU et le trafic ALB. Capacité élastique de 1 à N instances sans intervention.
+                        </p>
+                        <div class="mt-auto pt-4 flex items-center text-xs font-semibold text-orange-600">
+                            <i class="fas fa-arrow-right mr-2"></i> Zéro downtime
+                        </div>
+                    </div>
+                    <!-- Card 3: Automatisation -->
+                    <div class="highlight-card bg-white rounded-xl p-6 shadow-md border-t-4 border-indigo-500 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 text-indigo-100 text-6xl opacity-20 -z-0">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <div class="flex items-center mb-4 z-10">
+                            <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                                <i class="fas fa-robot text-xl text-indigo-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 font-heading">100% Automatisé</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed z-10">
+                            Déploiement reproductible via <strong>Terraform</strong> (Infra) et <strong>Ansible</strong> (Config). Élimination des erreurs manuelles et gestion de versions.
+                        </p>
+                        <div class="mt-auto pt-4 flex items-center text-xs font-semibold text-indigo-600">
+                            <i class="fas fa-arrow-right mr-2"></i> IaC Complet
+                        </div>
+                    </div>
+                    <!-- Card 4: Sécurité -->
+                    <div class="highlight-card bg-white rounded-xl p-6 shadow-md border-t-4 border-red-500 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 text-red-100 text-6xl opacity-20 -z-0">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="flex items-center mb-4 z-10">
+                            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-4">
+                                <i class="fas fa-shield-alt text-xl text-red-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 font-heading">Sécurité Renforcée</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed z-10">
+                            Principe du moindre privilège (IAM, SG), isolation réseau VPC, gestion des secrets via <strong>Secrets Manager</strong> et chiffrement TLS/EBS.
+                        </p>
+                        <div class="mt-auto pt-4 flex items-center text-xs font-semibold text-red-600">
+                            <i class="fas fa-arrow-right mr-2"></i> Compliance
+                        </div>
+                    </div>
+                    <!-- Card 5: Observabilité -->
+                    <div class="highlight-card bg-white rounded-xl p-6 shadow-md border-t-4 border-teal-500 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 text-teal-100 text-6xl opacity-20 -z-0">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="flex items-center mb-4 z-10">
+                            <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center mr-4">
+                                <i class="fas fa-chart-line text-xl text-teal-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 font-heading">Observabilité</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed z-10">
+                            Monitoring complet via <strong>CloudWatch</strong> (Métriques & Logs). Alarmes proactives et notifications SNS pour une réactivité immédiate.
+                        </p>
+                        <div class="mt-auto pt-4 flex items-center text-xs font-semibold text-teal-600">
+                            <i class="fas fa-arrow-right mr-2"></i> Tableaux de bord
+                        </div>
+                    </div>
+                    <!-- Card 6: Documentation & FinOps -->
+                    <div class="highlight-card bg-white rounded-xl p-6 shadow-md border-t-4 border-gray-600 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 text-gray-100 text-6xl opacity-20 -z-0">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="flex items-center mb-4 z-10">
+                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-4">
+                                <i class="fas fa-book text-xl text-gray-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 font-heading">Doc & FinOps</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed z-10">
+                            Documentation technique exhaustive du déploiement. Architecture optimisée pour le coût (<strong>~$291/mois</strong>) avec marge confortable sur budget 500$.
+                        </p>
+                        <div class="mt-auto pt-4 flex items-center text-xs font-semibold text-gray-600">
+                            <i class="fas fa-arrow-right mr-2"></i> Budget Respecté
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer Pagination -->
+                <div class="flex justify-between items-center mt-6 pt-2 border-t border-gray-100">
+                    <p class="text-xs text-gray-400">Architecture E-commerce Magento sur AWS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 14: Compliance -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col p-12 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-clipboard-check text-3xl text-green-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Conformité au cahier des charges</h2>
+                            <p class="text-green-600 font-semibold mt-1">Validation des exigences techniques et fonctionnelles</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="flex items-center bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                            <i class="fas fa-check-double text-green-600 mr-2"></i>
+                            <span class="font-bold text-green-800">100% Validé</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex-1 grid grid-cols-2 gap-8">
+                    <!-- Left Column: Infrastructure & Core -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 shadow-sm flex flex-col">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center pb-3 border-b border-gray-200">
+                            <i class="fas fa-server text-blue-600 mr-3"></i>
+                            Infrastructure & Core
+                        </h3>
+                        <div class="space-y-4 flex-1">
+                            <!-- Item 1 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">AWS Only</p>
+                                    <p class="text-sm text-gray-500">Infrastructure 100% hébergée sur AWS (eu-west-3)</p>
+                                </div>
+                            </div>
+                            <!-- Item 2 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Magento Open Source</p>
+                                    <p class="text-sm text-gray-500">Version 2.4.7-p1 installée via Composer</p>
+                                </div>
+                            </div>
+                            <!-- Item 3 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Infrastructure as Code</p>
+                                    <p class="text-sm text-gray-500">Terraform (Infra) + Ansible (Config) automatisés</p>
+                                </div>
+                            </div>
+                            <!-- Item 4 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Haute Disponibilité (HA)</p>
+                                    <p class="text-sm text-gray-500">Architecture Multi-AZ (ALB, ASG, RDS) résiliente</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Services & Sécurité -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 shadow-sm flex flex-col">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center pb-3 border-b border-gray-200">
+                            <i class="fas fa-shield-alt text-purple-600 mr-3"></i>
+                            Services & Sécurité
+                        </h3>
+                        <div class="space-y-4 flex-1">
+                            <!-- Item 5 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Scalabilité & Performance</p>
+                                    <p class="text-sm text-gray-500">Auto Scaling Group + CloudFront CDN</p>
+                                </div>
+                            </div>
+                            <!-- Item 6 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Base de Données</p>
+                                    <p class="text-sm text-gray-500">RDS MySQL 8.0 géré avec backups auto</p>
+                                </div>
+                            </div>
+                            <!-- Item 7 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Monitoring</p>
+                                    <p class="text-sm text-gray-500">CloudWatch Metrics + Alarmes SNS configurées</p>
+                                </div>
+                            </div>
+                            <!-- Item 8 -->
+                            <div class="check-item flex items-center p-3 rounded-lg bg-white border border-gray-100 shadow-sm">
+                                <div class="flex-shrink-0 mr-4">
+                                    <div class="w-8 h-8 rounded-full check-circle flex items-center justify-center text-white">
+                                        <i class="fas fa-check text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">Sécurité Renforcée</p>
+                                    <p class="text-sm text-gray-500">HTTPS (ACM), Private Subnets, SG restrictifs</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 15: Optimizations & Future -->
+    <div class="slide">
+        <div class="w-full h-full bg-white relative flex flex-col overflow-hidden">
+            <!-- Header Strip -->
+            <div class="h-4 bg-tech-green w-full"></div>
+            <!-- Main Content Container -->
+            <div class="flex-1 flex flex-col px-12 py-8 relative z-10">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="fas fa-rocket text-3xl text-blue-700"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-extrabold text-gray-800 tracking-tight font-heading">Optimisations & Évolutions</h2>
+                            <p class="text-blue-600 font-semibold mt-1">Roadmap technique & Amélioration continue</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 opacity-80">
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase tracking-wider border border-green-200">FinOps</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-bold uppercase tracking-wider border border-red-200">Security</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold uppercase tracking-wider border border-blue-200">DevOps</span>
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex space-x-10 h-full">
+                    <!-- Left Column: Icon Bullets List -->
+                    <div class="w-7/12 flex flex-col space-y-4">
+                        <!-- Item 1: FinOps -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-600"></div>
+                            <div class="bg-green-50 p-3 rounded-full mr-5 group-hover:bg-green-100 transition-colors">
+                                <i class="fas fa-piggy-bank text-2xl text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Optimisation des Coûts (FinOps)</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Réduction des coûts (~30-40%) via l'engagement sur la durée.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-tag mr-1 text-green-500"></i>Reserved Instances</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Savings Plans</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2: Performance / Redis -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-red"></div>
+                            <div class="bg-red-50 p-3 rounded-full mr-5 group-hover:bg-red-100 transition-colors">
+                                <i class="fas fa-bolt text-2xl text-aws-red"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Performance & Caching</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Décharge de la base de données et accélération des sessions Magento.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-layer-group mr-1 text-red-500"></i>ElastiCache (Redis)</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Varnish</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3: Security / WAF -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-aws-blue"></div>
+                            <div class="bg-blue-50 p-3 rounded-full mr-5 group-hover:bg-blue-100 transition-colors">
+                                <i class="fas fa-shield-virus text-2xl text-aws-blue"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Sécurité Avancée</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-2">Filtrage du trafic malveillant et protection contre les attaques Web (OWASP).</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200"><i class="fas fa-globe mr-1 text-blue-500"></i>AWS WAF</span>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200">Règles Gérées</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 4: CI/CD -->
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-100 shadow-md card-hover relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-600"></div>
+                            <div class="bg-purple-50 p-3 rounded-full mr-5 group-hover:bg-purple-100 transition-colors">
+                                <i class="fas fa-code-branch text-2xl text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800 mb-1">Automatisation CI/CD</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Pipeline complet pour tests, build et déploiement sans interruption.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Visual Roadmap -->
+                    <div class="w-5/12 flex flex-col">
+                        <div class="bg-gray-50 h-full rounded-2xl border border-gray-200 shadow-lg relative overflow-hidden p-6 flex flex-col">
+                            <!-- Decorative Background Icon -->
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                <i class="fas fa-map-signs text-9xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 font-heading border-b border-gray-200 pb-2">
+                                Trajectoire Technique
+                            </h3>
+                            <!-- Roadmap Timeline -->
+                            <div class="space-y-4 flex-1">
+                                <div class="flex items-start bg-white p-3 rounded shadow-sm border-l-4 border-green-500">
+                                    <div class="min-w-[60px] text-xs font-bold text-green-600 uppercase mt-1">Court Terme</div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-bold text-gray-800">Performance & Sécurité</h4>
+                                        <p class="text-xs text-gray-500">Mise en place WAF & Redis Cache</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start bg-white p-3 rounded shadow-sm border-l-4 border-blue-500">
+                                    <div class="min-w-[60px] text-xs font-bold text-blue-600 uppercase mt-1">Moyen Terme</div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-bold text-gray-800">Optimisation FinOps</h4>
+                                        <p class="text-xs text-gray-500">Achat Reserved Instances (RI)</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start bg-white p-3 rounded shadow-sm border-l-4 border-purple-500">
+                                    <div class="min-w-[60px] text-xs font-bold text-purple-600 uppercase mt-1">Long Terme</div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-bold text-gray-800">Résilience Maximale</h4>
+                                        <p class="text-xs text-gray-500">Disaster Recovery Multi-région</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Disaster Recovery Focus Box -->
+                            <div class="mt-auto bg-white rounded-lg p-4 border-l-4 border-orange-500 shadow-sm">
+                                <h4 class="text-orange-800 font-bold text-sm mb-1 flex items-center">
+                                    <i class="fas fa-globe-europe mr-2"></i> Disaster Recovery (DR)
+                                </h4>
+                                <p class="text-xs text-gray-600 leading-snug">
+                                    Évolution vers une architecture <strong>Multi-Région Active-Passive</strong> avec réplication RDS Cross-Region et failover DNS Route53 pour garantir la continuité en cas de panne régionale majeure.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 16: Conclusion -->
+    <div class="slide">
+        <div class="w-full h-full bg-tech-green relative flex flex-col overflow-hidden text-white">
+            <!-- Background Elements -->
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-green-800 opacity-20 transform skew-x-12 translate-x-20"></div>
+            <div class="absolute -bottom-20 -left-20 text-white opacity-5">
+                <i class="fas fa-leaf text-[400px]"></i>
+            </div>
+            <!-- Main Container -->
+            <div class="relative z-10 flex flex-col h-full p-12">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-10 border-b border-green-700 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white p-2 rounded-lg">
+                            <i class="fas fa-leaf text-tech-green text-2xl"></i>
+                        </div>
+                        <p class="text-2xl font-bold font-heading tracking-wide">GreenLeaf</p>
+                    </div>
+                    <div class="text-green-300 font-semibold tracking-wider uppercase text-sm">
+                        Synthèse & Clôture
+                    </div>
+                </div>
+                <!-- Content Grid -->
+                <div class="flex-1 grid grid-cols-2 gap-12">
+                    <!-- Left Column: Summary & Achievements -->
+                    <div class="flex flex-col justify-center">
+                        <h1 class="text-5xl font-extrabold font-heading mb-8 leading-tight">
+                            Architecture<br>
+                            <span class="text-green-400">Validée & Prête</span>
+                        </h1>
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-green-500 rounded-full p-1 mt-1 mr-4">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-bold text-white mb-1">Robustesse & Scalabilité</p>
+                                    <p class="text-green-200 text-sm">Architecture Multi-AZ tolérante aux pannes avec Auto Scaling fonctionnel.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-green-500 rounded-full p-1 mt-1 mr-4">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-bold text-white mb-1">Conformité Totale</p>
+                                    <p class="text-green-200 text-sm">Respect strict du cahier des charges : AWS, Terraform, Ansible, Magento.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-green-500 rounded-full p-1 mt-1 mr-4">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-bold text-white mb-1">Budget Optimisé</p>
+                                    <p class="text-green-200 text-sm">Coût estimé $291.50/mois (optimisé: $254.90), marge confortable sur budget 500$.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-green-500 rounded-full p-1 mt-1 mr-4">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-bold text-white mb-1">Sécurité by Design</p>
+                                    <p class="text-green-200 text-sm">Chiffrement TLS/EBS, moindres privilèges IAM et isolation réseau.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Next Steps & Q&A -->
+                    <div class="flex flex-col space-y-8">
+                        <!-- Roadmap Box -->
+                        <div class="glass-card rounded-2xl p-8 shadow-xl">
+                            <h3 class="text-xl font-bold text-green-300 mb-6 uppercase tracking-wider flex items-center">
+                                <i class="fas fa-road mr-3"></i> Prochaines Étapes
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-arrow-right text-green-400 mr-3"></i>
+                                    <p>Tests de charge intensifs (JMeter)</p>
+                                </div>
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-arrow-right text-green-400 mr-3"></i>
+                                    <p>Mise en place pipeline CI/CD complet</p>
+                                </div>
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-arrow-right text-green-400 mr-3"></i>
+                                    <p>Ajout AWS WAF & Cache Redis</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Q&A Section -->
+                        <div class="flex-1 flex flex-col justify-center items-center text-center mt-4">
+                            <div class="mb-6">
+                                <i class="fas fa-question-circle text-6xl text-green-300 opacity-50"></i>
+                            </div>
+                            <p class="text-4xl font-bold font-heading mb-2">Merci !</p>
+                            <p class="text-2xl text-green-300 font-light mb-8">Avez-vous des questions ?</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="mt-8 pt-6 border-t border-green-800 flex justify-between items-center text-sm text-green-400 opacity-60">
+                    <p>GreenLeaf - Projet Infrastructure Cloud 2026</p>
+                    <div class="flex space-x-4">
+                        <span><i class="fab fa-aws mr-1"></i> AWS</span>
+                        <span><i class="fas fa-code mr-1"></i> Terraform</span>
+                        <span><i class="fas fa-terminal mr-1"></i> Ansible</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">
+            <i class="fas fa-chevron-left"></i> Précédent
+        </button>
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">16</span>
+        </div>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">
+            Suivant <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        // Update slide counter display
+        document.getElementById('totalSlides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            // Handle wrap-around
+            if (n >= totalSlides) {
+                currentSlide = 0;
+            } else if (n < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = n;
+            }
+            
+            // Hide all slides
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            // Show current slide
+            slides[currentSlide].classList.add('active');
+            
+            // Update counter
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            // Update button states
+            document.getElementById('prevBtn').disabled = false;
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault(); // Prevent spacebar from scrolling
+                changeSlide(1);
+            } else if (e.key === 'Home') {
+                showSlide(0);
+            } else if (e.key === 'End') {
+                showSlide(totalSlides - 1);
+            }
+        });
+        
+        // Initialize Chart.js for slide 11 (Costs & FinOps)
+        let costChartInstance = null;
+        function initCostChart() {
+            const chartCanvas = document.getElementById('costChart');
+            if (chartCanvas && !costChartInstance) {
+                const ctx = chartCanvas.getContext('2d');
+                costChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['RDS (Base de données)', 'EC2 (Web + Search)', 'VPC & Réseau (NAT + ALB)', 'Cache & Transfert', 'Stockage & Monitoring'],
+                        datasets: [{
+                            data: [72.00, 50.40, 100.90, 58.00, 10.20],
+                            backgroundColor: [
+                                '#3B82F6', // Blue for RDS
+                                '#F97316', // Orange for EC2
+                                '#8B5CF6', // Purple for VPC/ALB
+                                '#10B981', // Green for Cache/Transfer
+                                '#6B7280'  // Gray for Storage/Monitoring
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    usePointStyle: true,
+                                    font: {
+                                        family: "'Open Sans', sans-serif",
+                                        size: 11
+                                    },
+                                    boxWidth: 8
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += '$' + context.parsed;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
+        }
+        
+        // Modify showSlide to initialize chart when needed
+        const originalShowSlide = showSlide;
+        showSlide = function(n) {
+            originalShowSlide(n);
+            // Check if we're on slide 11 (index 10) and initialize chart
+            if (currentSlide === 10) {
+                setTimeout(initCostChart, 100);
+            }
+        };
+        
+        // Initialize
+        showSlide(0);
+        
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next slide
+                    changeSlide(1);
+                } else {
+                    // Swipe right - previous slide
+                    changeSlide(-1);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

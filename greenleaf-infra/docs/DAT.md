@@ -28,25 +28,25 @@ Cette architecture répond aux exigences de haute disponibilité en répartissan
                            │ HTTP (80) / HTTPS (443)
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Application Load Balancer (ALB)                 │
+│              Application Load Balancer (ALB)                │
 │              - Multi-AZ (2 zones de disponibilité)          │
-│              - Security Group: 80/443 depuis Internet        │
+│              - Security Group: 80/443 depuis Internet       │
 │              - Health Check: HTTP / (interval: 30s)         │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                            │ HTTP (80) depuis ALB SG
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Auto Scaling Group (ASG)                         │
-│  ┌────────────────────┐      ┌────────────────────┐        │
-│  │  EC2 Instance 1    │      │  EC2 Instance 2    │        │
-│  │  - t3.micro        │      │  - t3.micro        │        │
-│  │  - Ubuntu 22.04    │      │  - Ubuntu 22.04    │        │
-│  │  - Nginx           │      │  - Nginx           │        │
-│  │  - PHP 8.2-FPM     │      │  - PHP 8.2-FPM     │        │
-│  │  - Magento 2.4.7   │      │  - Magento 2.4.7   │        │
-│  │  - Public Subnet 1 │      │  - Public Subnet 2 │        │
-│  └────────────────────┘      └────────────────────┘        │
+│              Auto Scaling Group (ASG)                       │
+│  ┌────────────────────┐      ┌────────────────────┐         │
+│  │  EC2 Instance 1    │      │  EC2 Instance 2    │         │
+│  │  - t3.micro        │      │  - t3.micro        │         │
+│  │  - Ubuntu 22.04    │      │  - Ubuntu 22.04    │         │
+│  │  - Nginx           │      │  - Nginx           │         │
+│  │  - PHP 8.2-FPM     │      │  - PHP 8.2-FPM     │         │
+│  │  - Magento 2.4.7   │      │  - Magento 2.4.7   │         │
+│  │  - Public Subnet 1 │      │  - Public Subnet 2 │         │
+│  └────────────────────┘      └────────────────────┘         │
 │              Min: 1 | Desired: 1 | Max: 2                   │
 └──────────────────────────┬──────────────────────────────────┘
                            │
@@ -56,29 +56,29 @@ Cette architecture répond aux exigences de haute disponibilité en répartissan
 │              Amazon RDS MySQL 8.0                           │
 │              - db.t3.micro                                  │
 │              - Multi-AZ: Activé (par défaut)                │
-│              - Storage: 20 GB                                │
+│              - Storage: 20 GB                               │
 │              - Non accessible publiquement                  │
 │              - Security Group: 3306 depuis EC2 SG           │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
 │              VPC (10.0.0.0/16)                              │
-│  ┌────────────────────┐      ┌────────────────────┐        │
-│  │  Public Subnet 1   │      │  Public Subnet 2   │        │
-│  │  10.0.1.0/24       │      │  10.0.2.0/24       │        │
-│  │  AZ-1              │      │  AZ-2              │        │
-│  │  - ALB             │      │  - ALB             │        │
-│  │  - EC2 Instances   │      │  - EC2 Instances   │        │
-│  │  - RDS (optionnel) │      │  - RDS (optionnel) │        │
-│  └────────────────────┘      └────────────────────┘        │
-│                                                              │
+│  ┌────────────────────┐      ┌────────────────────┐         │
+│  │  Public Subnet 1   │      │  Public Subnet 2   │         │
+│  │  10.0.1.0/24       │      │  10.0.2.0/24       │         │
+│  │  AZ-1              │      │  AZ-2              │         │
+│  │  - ALB             │      │  - ALB             │         │
+│  │  - EC2 Instances   │      │  - EC2 Instances   │         │
+│  │  - RDS (optionnel) │      │  - RDS (optionnel) │         │
+│  └────────────────────┘      └────────────────────┘         │
+│                                                             │
 │  Internet Gateway (IGW)                                     │
-│  - Route: 0.0.0.0/0 → IGW                                  │
+│  - Route: 0.0.0.0/0 → IGW                                   │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
 │              CloudWatch                                     │
-│              - Alarm: CPU > 70% (2 périodes de 5 min)      │
+│              - Alarm: CPU > 70% (2 périodes de 5 min)       │
 │              - Métriques: EC2, RDS, ALB                     │
 └─────────────────────────────────────────────────────────────┘
 
